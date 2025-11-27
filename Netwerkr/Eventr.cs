@@ -8,17 +8,17 @@ namespace Netwerkr
 {
     public class Eventr
     {
-        public string Name { get; }
-        public event Action<string> Received;
+        public string name { get; }
+        public event Action<string> received;
 
-        public Eventr(string name)
+        public Eventr(string Name)
         {
-            Name = name;
+            name = Name;
         }
 
         internal void Invoke(string data)
         {
-            Received?.Invoke(data);
+            received?.Invoke(data);
         }
     }
 }

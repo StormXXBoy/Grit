@@ -8,16 +8,16 @@ namespace Netwerkr
     {
         private readonly TcpClient _client;
         private readonly NetworkStream _stream;
-        private readonly Dictionary<string, Eventr> _events = new();
+        private readonly Dictionary<string, Eventr> _events = new Dictionary<string, Eventr>();
 
         public NetwerkrConnection(TcpClient client)
         {
             _client = client;
             _stream = client.GetStream();
-            StartReading();
+            startReading();
         }
 
-        public Eventr Listen(string eventName)
+        public Eventr listen(string eventName)
         {
             if (!_events.ContainsKey(eventName))
                 _events[eventName] = new Eventr(eventName);
@@ -25,14 +25,14 @@ namespace Netwerkr
             return _events[eventName];
         }
 
-        public async void Fire(string eventName, string data)
+        public async void fire(string eventName, string data)
         {
             string packet = eventName + ":" + data + "\n";
             byte[] bytes = Encoding.UTF8.GetBytes(packet);
             await _stream.WriteAsync(bytes, 0, bytes.Length);
         }
 
-        private async void StartReading()
+        private async void startReading()
         {
             var buffer = new byte[4096];
             var sb = new StringBuilder();
@@ -51,12 +51,12 @@ namespace Netwerkr
                     string fullPacket = line.Substring(0, index);
                     sb.Remove(0, index + 1);
 
-                    HandlePacket(fullPacket);
+                    handlePacket(fullPacket);
                 }
             }
         }
 
-        private void HandlePacket(string packet)
+        private void handlePacket(string packet)
         {
             int sep = packet.IndexOf(':');
             if (sep < 0) return;
