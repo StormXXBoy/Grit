@@ -1,84 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
+﻿using Netwerkr;
+using System;
 
 namespace Server
 {
     class Program
     {
-        static List<TcpClient> clients = new List<TcpClient>();
+        private Netwerkr.Netwerkr net = new Netwerkr.Netwerkr();
+        private NetwerkrServer server;
 
-        static void Main()
+        void Start()
         {
-            TcpListener server = new TcpListener(IPAddress.Any, 5000);
+            server = net.startServer();
             server.Start();
-            Console.WriteLine("Server running...");
+
+            server.listen("test", (clientId, data) =>
+            {
+                Console.WriteLine($"Received from {clientId}: {data}");
+
+            });
 
             while (true)
             {
-                TcpClient client = server.AcceptTcpClient();
-                clients.Add(client);
-
-                Console.WriteLine("Client connected.");
-                Thread thread = new Thread(() => HandleClient(client));
-                thread.Start();
+                System.Threading.Thread.Sleep(1000);
             }
         }
 
-        static void HandleClient(TcpClient client)
+        static void Main(string[] args)
         {
-            NetworkStream stream = client.GetStream();
-            byte[] buffer = new byte[1024];
-
-            void broadcast(string message)
-            {
-                byte[] data = Encoding.UTF8.GetBytes(message);
-
-                foreach (var c in clients.ToArray())
-                {
-                    if (c == client) continue;
-                    try
-                    {
-                        NetworkStream s = c.GetStream();
-                        s.Write(data, 0, data.Length);
-                    }
-                    catch
-                    {
-                        clients.Remove(c);
-                    }
-                }
-            }
-
-            broadcast("A new client has connected.");
-
-            try
-            {
-                while (true)
-                {
-                    int byteCount = stream.Read(buffer, 0, buffer.Length);
-
-                    if (byteCount == 0)
-                        break;
-
-                    string data = Encoding.UTF8.GetString(buffer, 0, byteCount);
-                    Console.WriteLine("Received: " + data);
-
-                    broadcast("e");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Client disconnected with error: " + ex.Message);
-            }
-            finally
-            {
-                clients.Remove(client);
-                client.Close();
-                Console.WriteLine("Client fully removed.");
-            }
+            Program p = new Program();
+            p.Start();
         }
     }
 }

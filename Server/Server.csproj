@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Netwerkr\Netwerkr.csproj">
+      <Project>{a09ed7cd-dc82-4765-857f-0ea3fd237124}</Project>
+      <Name>Netwerkr</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

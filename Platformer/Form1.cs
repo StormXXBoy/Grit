@@ -1,6 +1,7 @@
 ﻿using NAudio;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using Netwerkr;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,6 +20,9 @@ namespace Platformer
 {
     public partial class Form1 : Form
     {
+        public Netwerkr.Netwerkr net = new Netwerkr.Netwerkr();
+        public NetwerkrClient client;
+
         Size gameBounds = new Size(500, 500);
         Graphics area;
         Bitmap backgroundImage = Properties.Resources.background;
@@ -281,6 +285,11 @@ namespace Platformer
             }
 
             area.DrawImageUnscaled(backBuffer, 0, 0);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            client = net.startClient("127.0.0.1");
         }
     }
 }
