@@ -27,6 +27,14 @@ namespace Platformer
             keyDownEvents[key] += action;
         }
 
+        public void SubscribeKeyUp(Keys key, Action action)
+        {
+            if (!keyUpEvents.ContainsKey(key))
+                keyUpEvents[key] = null;
+
+            keyUpEvents[key] += action;
+        }
+
         private void HandleKeyDown(object sender, KeyEventArgs e)
         {
             if (keysDown.Add(e.KeyCode))
@@ -45,6 +53,11 @@ namespace Platformer
         public bool IsKeyDown(Keys key)
         {
             return keysDown.Contains(key);
+        }
+
+        public bool IsKeyUp(Keys key)
+        {
+            return !IsKeyDown(key);
         }
     }
 }
