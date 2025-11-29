@@ -42,6 +42,7 @@ namespace Platformer
         public Form1()
         {
             InitializeComponent();
+
             this.Load += (s, e) => Start();
             this.Resize += (s, e) => onResize();
             gameScreen.MouseDown += (s, e) => HandleClick(s, e);
@@ -112,7 +113,11 @@ namespace Platformer
             backBuffer = new Bitmap(gameBounds.Width, gameBounds.Height);
 
             input = new InputHandler(this);
-            input.SubscribeKeyDown(Keys.Escape, () => { menu.Visible = !menu.Visible; });
+            input.SubscribeKeyDown(Keys.Escape, () => {
+                this.ActiveControl = null;
+                menu.Visible = !menu.Visible;
+                menu.Enabled = menu.Visible;
+            });
 
             player = addEntity(new Entity());
 
@@ -151,7 +156,15 @@ namespace Platformer
         {
             HandleInput(dt);
             PhysicsLoop();
+            UpdateNetwork();
             DrawLoop();
+        }
+
+        void UpdateNetwork()
+        {
+            if (client == null) return;
+            string data = $"{player.position.X}/{player.position.Y}/{player.velocity.X}/{player.velocity.Y}";
+            client.fire("update", data);
         }
 
         bool isGrounded(Entity entity)
@@ -290,6 +303,48 @@ namespace Platformer
         private void button1_Click(object sender, EventArgs e)
         {
             client = net.startClient("127.0.0.1");
+
+            void handleData(string data)
+            {
+                if (string.IsNullOrWhiteSpace(data)) return;
+
+                string[] clientsData = data.Split('|');
+
+                foreach (var entry in clientsData)
+                {
+                    if (string.IsNullOrWhiteSpace(entry)) continue;
+
+                    var parts = entry.Split('/');
+                    if (parts.Length != 5) continue;
+
+                    string id = parts[0];
+                    float x = float.Parse(parts[1]);
+                    float y = float.Parse(parts[2]);
+                    float vx = float.Parse(parts[3]);
+                    float vy = float.Parse(parts[4]);
+
+                    Entity ent = entities.FirstOrDefault(a => a.id == id);
+
+                    if (ent == null)
+                    {
+                        ent = new Entity();
+                        ent.id = id;
+                        addEntity(ent);
+                    }
+
+                    ent.position.X = x;
+                    ent.position.Y = y;
+                }
+            }
+
+            client.listen("connect", handleData);
+
+            client.listen("update", handleData);
+        }
+
+        private void TestButton_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("Test button clicked");
         }
     }
 }

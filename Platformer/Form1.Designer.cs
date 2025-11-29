@@ -30,8 +30,8 @@
         {
             this.gameScreen = new System.Windows.Forms.PictureBox();
             this.menu = new System.Windows.Forms.Panel();
-            this.ConnectButton = new System.Windows.Forms.Button();
             this.TestButton = new System.Windows.Forms.Button();
+            this.ConnectButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).BeginInit();
             this.menu.SuspendLayout();
             this.SuspendLayout();
@@ -58,6 +58,16 @@
             this.menu.TabIndex = 1;
             this.menu.Visible = false;
             // 
+            // TestButton
+            // 
+            this.TestButton.Location = new System.Drawing.Point(322, 345);
+            this.TestButton.Name = "TestButton";
+            this.TestButton.Size = new System.Drawing.Size(75, 23);
+            this.TestButton.TabIndex = 1;
+            this.TestButton.Text = "Test";
+            this.TestButton.UseVisualStyleBackColor = true;
+            this.TestButton.Click += new System.EventHandler(this.TestButton_Click);
+            // 
             // ConnectButton
             // 
             this.ConnectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -70,15 +80,6 @@
             this.ConnectButton.UseVisualStyleBackColor = true;
             this.ConnectButton.Click += new System.EventHandler(this.button1_Click);
             // 
-            // TestButton
-            // 
-            this.TestButton.Location = new System.Drawing.Point(322, 345);
-            this.TestButton.Name = "TestButton";
-            this.TestButton.Size = new System.Drawing.Size(75, 23);
-            this.TestButton.TabIndex = 1;
-            this.TestButton.Text = "Test";
-            this.TestButton.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -86,6 +87,7 @@
             this.ClientSize = new System.Drawing.Size(584, 561);
             this.Controls.Add(this.menu);
             this.Controls.Add(this.gameScreen);
+            this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).EndInit();

@@ -61,6 +61,7 @@ namespace Netwerkr
     {
         public TcpListener listener;
         public Dictionary<string, TcpClient> clients = new Dictionary<string, TcpClient>();
+        public Action<string> clientConnected = null;
         private Dictionary<string, Action<string, string>> eventHandlers = new Dictionary<string, Action<string, string>>();
 
         public NetwerkrServer(int port)
@@ -92,6 +93,8 @@ namespace Netwerkr
             state.Client = tcp;
             state.Stream = stream;
             state.ClientId = clientId;
+
+            clientConnected?.Invoke(clientId);
 
             stream.BeginRead(state.Buffer, 0, state.Buffer.Length, OnDataReceived, state);
         }

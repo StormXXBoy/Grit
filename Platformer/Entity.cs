@@ -45,6 +45,8 @@ namespace Platformer
 
     internal class Entity
     {
+        public string id = Guid.NewGuid().ToString();
+
         public int health = 100;
         public float speed = 1;
         public Color color = Color.HotPink;
