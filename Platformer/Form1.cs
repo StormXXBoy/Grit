@@ -126,8 +126,6 @@ namespace Platformer
             platforms.Add(new Platform(100, gameBounds.Height - 30, 200, 20));
             platforms.Add(new Platform(350, 200, 200, 20));
 
-            addEntity(new Entity());
-
             StartLoop();
         }
 
@@ -185,7 +183,7 @@ namespace Platformer
         {
             if (isGrounded(entity) && DateTime.Now - entity.lastJumpTime >= jumpCooldown)
             {
-                entity.acceleration.Y -= gravity * 10;
+                entity.acceleration.Y -= 2;
                 entity.lastJumpTime = DateTime.Now;
                 //soundMachine.Play("jump");
             }
@@ -300,7 +298,7 @@ namespace Platformer
             area.DrawImageUnscaled(backBuffer, 0, 0);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Connect_Click(object sender, EventArgs e)
         {
             client = net.startClient("127.0.0.1");
 
@@ -334,6 +332,8 @@ namespace Platformer
 
                     ent.position.X = x;
                     ent.position.Y = y;
+                    ent.velocity.X = vx;
+                    ent.velocity.Y = vy;
                 }
             }
 

@@ -78,7 +78,7 @@
             this.ConnectButton.TabIndex = 0;
             this.ConnectButton.Text = "Connect Local";
             this.ConnectButton.UseVisualStyleBackColor = true;
-            this.ConnectButton.Click += new System.EventHandler(this.button1_Click);
+            this.ConnectButton.Click += new System.EventHandler(this.Connect_Click);
             // 
             // Form1
             // 
