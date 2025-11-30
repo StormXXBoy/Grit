@@ -37,6 +37,9 @@ namespace Platformer
 
         List<Platform> platforms = new List<Platform>();
 
+        List<Entity> physics = new List<Entity>();
+        List<Entity> collisions = new List<Entity>();
+
         SoundMachine soundMachine = new SoundMachine();
 
         public Form1()
@@ -94,6 +97,7 @@ namespace Platformer
                 newBullet.position = new Vector(player.position);
                 newBullet.acceleration = new Vector(player.acceleration);
                 newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
+                //player.velocity += (shootDirection.normalize() * 50f);
 
                 newBullet.size = new Size(10, 10);
 
@@ -156,13 +160,6 @@ namespace Platformer
             PhysicsLoop();
             UpdateNetwork();
             DrawLoop();
-        }
-
-        void UpdateNetwork()
-        {
-            if (client == null) return;
-            string data = $"{player.position.X}/{player.position.Y}/{player.velocity.X}/{player.velocity.Y}";
-            client.fire("update", data);
         }
 
         bool isGrounded(Entity entity)
@@ -276,6 +273,20 @@ namespace Platformer
                 entity.velocity.Y = 0;
                 entity.acceleration.Y = 0;
             }
+
+            if (entity.position.X + entity.size.Width > gameBounds.Width)
+            {
+                entity.position.X = gameBounds.Width - entity.size.Width;
+                entity.velocity.X = 0;
+                entity.acceleration.X = 0;
+            }
+
+            if (entity.position.X < 0)
+            {
+                entity.position.X = 0;
+                entity.velocity.X = 0;
+                entity.acceleration.X = 0;
+            }
         }
 
         void DrawLoop()
@@ -296,6 +307,13 @@ namespace Platformer
             }
 
             area.DrawImageUnscaled(backBuffer, 0, 0);
+        }
+
+        void UpdateNetwork()
+        {
+            if (client == null) return;
+            string data = $"{player.position.X}/{player.position.Y}/{player.velocity.X}/{player.velocity.Y}";
+            client.fire("update", data);
         }
 
         private void Connect_Click(object sender, EventArgs e)
