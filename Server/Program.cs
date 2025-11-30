@@ -24,11 +24,11 @@ namespace Server
         }
     }
 
-    class Program
+    public class Program
     {
         private Netwerkr.Netwerkr net = new Netwerkr.Netwerkr();
 
-        void Start()
+        public void Start()
         {
             NetwerkrServer server = net.startServer();
             server.Start();
@@ -68,20 +68,26 @@ namespace Server
                 }
             });
 
-            while (true)
+            System.Timers.Timer broadcastTimer = new System.Timers.Timer(10);
+            broadcastTimer.Start();
+
+            broadcastTimer.Elapsed += (sender, e) =>
             {
-                System.Threading.Thread.Sleep(10);
                 foreach (var item in clientsData)
                 {
                     server.fireClient(item.clientId, "update", clientsDataExept(item.clientId));
                 }
-            }
+            };
         }
 
         static void Main(string[] args)
         {
             Program p = new Program();
             p.Start();
+            while (true)
+            {
+                System.Threading.Thread.Sleep(10);
+            }
         }
     }
 }

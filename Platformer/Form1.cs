@@ -370,6 +370,9 @@ namespace Platformer
         private void TestButton_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Test button clicked");
+            Server.Program serverProgram = new Server.Program();
+            serverProgram.Start();
+            Connect_Click(null, null);
         }
     }
 }
