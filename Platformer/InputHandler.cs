@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Platformer
 {
-    internal class InputHandler
+    public class InputHandler
     {
         private HashSet<Keys> keysDown = new HashSet<Keys>();
         private readonly Dictionary<Keys, Action> keyDownEvents = new Dictionary<Keys, Action>();

@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,18 +27,17 @@ namespace Platformer
         Size gameBounds = new Size(500, 500);
         Graphics area;
         Bitmap backgroundImage = Properties.Resources.background;
+        Bitmap brickImage = Properties.Resources.brick;
         Bitmap backBuffer;
 
         Color background = Color.White;
 
         InputHandler input;
-
-        List<Entity> entities = new List<Entity>();
-        Entity player;
-
-        List<Platform> platforms = new List<Platform>();
-
         SoundMachine soundMachine = new SoundMachine();
+
+        private World world = new World();
+        private List<GameSystem> systems = new List<GameSystem>();
+        private int playerEntityId;
 
         public Form1()
         {
@@ -50,7 +50,8 @@ namespace Platformer
             onResize();
         }
 
-        void onResize() {
+        void onResize()
+        {
             void centerControl(Control control)
             {
                 control.Left = (this.ClientSize.Width - control.Width) / 2;
@@ -72,7 +73,6 @@ namespace Platformer
                 }
                 else
                 {
-                    platforms.Add(new Platform(350, 200, 200, 20));
                     Point start = bufferPoint.Value;
                     Point end = e.Location;
 
@@ -81,30 +81,38 @@ namespace Platformer
                     int w = Math.Abs(end.X - start.X);
                     int h = Math.Abs(end.Y - start.Y);
 
-                    platforms.Add(new Platform(x, y, w, h));
+                    //platforms.Add(new Platform(x, y, w, h));
+
+                    int platformEntity = world.CreateEntity();
+                    world.AddComponent(platformEntity, new Transform(
+                        new Vector(x, y),
+                        new Size(w, h)
+                    ));
+                    world.AddComponent(platformEntity, new Renderable { Sprite = brickImage });
+                    world.AddComponent(platformEntity, new Physics { UseGravity = false, Collidable = true});
+
                     bufferPoint = null;
                 }
             }
             else
             {
-                Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
+                var playerTransform = world.GetComponent<Transform>(playerEntityId);
+                Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - playerTransform.Position;
 
-                Entity newBullet = new Entity(Color.SteelBlue);
+                int bulletEntity = world.CreateEntity();
+                world.AddComponent(bulletEntity, new Transform(
+                    new Vector(playerTransform.Position),
+                    new Size(10, 10)
+                ));
+                world.AddComponent(bulletEntity, new Renderable { Color = Color.SteelBlue });
+                world.AddComponent(bulletEntity, new Physics { UseGravity = true });
+                world.AddComponent(bulletEntity, new Bullet { Lifetime = 5f, Damage = 10f });
 
-                newBullet.position = new Vector(player.position);
-                newBullet.acceleration = new Vector(player.acceleration);
-                newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
-
-                newBullet.size = new Size(10, 10);
-
-                addEntity(newBullet);
+                // Set bullet velocity
+                var bulletTransform = world.GetComponent<Transform>(bulletEntity);
+                bulletTransform.Velocity = new Vector(playerTransform.Velocity) + (shootDirection.normalize() * 50f);
+                world.SetComponent(bulletEntity, bulletTransform);
             }
-        }
-
-        Entity addEntity(Entity entity)
-        {
-            entities.Add(entity);
-            return entity;
         }
 
         void Start()
@@ -119,14 +127,29 @@ namespace Platformer
                 menu.Enabled = menu.Visible;
             });
 
-            player = addEntity(new Entity());
+            playerEntityId = world.CreateEntity();
+            world.AddComponent(playerEntityId, new Transform(new Vector(0, 0), new Size(10, 20)));
+            world.AddComponent(playerEntityId, new Renderable { Color = Color.SteelBlue });
+            world.AddComponent(playerEntityId, new Physics
+            {
+                UseGravity = true,
+                Mass = 1f,
+                LastJumpTime = DateTime.Now
+            });
+            world.AddComponent(playerEntityId, new Player
+            {
+                MoveSpeed = 1f,
+                JumpForce = 10f
+            });
 
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
 
-            platforms.Add(new Platform(100, gameBounds.Height - 30, 200, 20));
-            platforms.Add(new Platform(350, 200, 200, 20));
+            //platforms.Add(new Platform(100, gameBounds.Height - 30, 200, 20));
+            //platforms.Add(new Platform(350, 200, 200, 20));
 
-            addEntity(new Entity());
+            systems.Add(new InputSystem(world, input));
+            systems.Add(new PhysicsSystem(world));
+            systems.Add(new RenderSystem(world, area, backBuffer, backgroundImage, playerEntityId));
 
             StartLoop();
         }
@@ -154,150 +177,19 @@ namespace Platformer
 
         void Loop(float dt)
         {
-            HandleInput(dt);
-            PhysicsLoop();
-            UpdateNetwork();
-            DrawLoop();
+            foreach (var system in systems)
+            {
+                system.Update(dt);
+            }
         }
 
         void UpdateNetwork()
         {
             if (client == null) return;
-            string data = $"{player.position.X}/{player.position.Y}/{player.velocity.X}/{player.velocity.Y}";
+
+            var playerTransform = world.GetComponent<Transform>(playerEntityId);
+            string data = $"{playerTransform.Position.X}/{playerTransform.Position.Y}/{playerTransform.Velocity.X}/{playerTransform.Velocity.Y}";
             client.fire("update", data);
-        }
-
-        bool isGrounded(Entity entity)
-        {
-            RectangleF feet = new RectangleF(entity.position.X, entity.position.Y + entity.size.Height, entity.size.Width, 1);
-
-            foreach (var p in platforms)
-            {
-                if (feet.IntersectsWith(p.bounds))
-                    return true;
-            }
-
-            return entity.position.Y + entity.size.Height >= gameBounds.Height;
-        }
-
-        TimeSpan jumpCooldown = TimeSpan.FromMilliseconds(200);
-        void entityJump(Entity entity)
-        {
-            if (isGrounded(entity) && DateTime.Now - entity.lastJumpTime >= jumpCooldown)
-            {
-                entity.acceleration.Y -= gravity * 10;
-                entity.lastJumpTime = DateTime.Now;
-                //soundMachine.Play("jump");
-            }
-        }
-
-        void HandleInput(float dt)
-        {
-            if (input.IsKeyDown(Keys.Right) || input.IsKeyDown(Keys.D))
-            {
-                player.MoveHorizontal(dt, 1);
-            }
-            if (input.IsKeyDown(Keys.Left) || input.IsKeyDown(Keys.Q))
-            {
-                player.MoveHorizontal(dt, -1);
-            }
-            if (input.IsKeyDown(Keys.Up) || input.IsKeyDown(Keys.Space))
-            {
-                entityJump(player);
-            }
-        }
-
-        float gravity = 0.2f;
-        float friction = 0.9f;
-        void PhysicsLoop()
-        {
-            foreach (var entity in entities)
-            {
-                if (!isGrounded(entity))
-                    entity.acceleration.Y += gravity;
-
-                entity.velocity += entity.acceleration;
-
-                entity.acceleration *= friction;
-                entity.velocity *= friction;
-
-                entity.position.X += entity.velocity.X;
-                ResolveAxisCollision(entity, axisX: true);
-
-                entity.position.Y += entity.velocity.Y;
-                ResolveAxisCollision(entity, axisX: false);
-            }
-        }
-
-        void ResolveAxisCollision(Entity entity, bool axisX)
-        {
-            RectangleF rect = new RectangleF(
-                entity.position.X,
-                entity.position.Y,
-                entity.size.Width,
-                entity.size.Height
-            );
-
-            foreach (var p in platforms)
-            {
-                if (!rect.IntersectsWith(p.bounds))
-                    continue;
-
-                if (axisX)
-                {
-                    if (entity.velocity.X > 0)
-                        entity.position.X = p.bounds.X - entity.size.Width;
-                    else if (entity.velocity.X < 0)
-                        entity.position.X = p.bounds.X + p.bounds.Width;
-
-                    entity.velocity.X *= -0.7f;
-                    entity.acceleration.X = 0;
-                }
-                else
-                {
-                    if (entity.velocity.Y > 0)
-                        entity.position.Y = p.bounds.Y - entity.size.Height;
-                    else if (entity.velocity.Y < 0)
-                        entity.position.Y = p.bounds.Y + p.bounds.Height;
-
-                    entity.velocity.Y = 0;
-                    entity.acceleration.Y = 0;
-                }
-
-                rect = new RectangleF(
-                    entity.position.X,
-                    entity.position.Y,
-                    entity.size.Width,
-                    entity.size.Height
-                );
-            }
-
-            if (entity.position.Y + entity.size.Height > gameBounds.Height)
-            {
-                entity.position.Y = gameBounds.Height - entity.size.Height;
-                entity.velocity.Y = 0;
-                entity.acceleration.Y = 0;
-            }
-        }
-
-        void DrawLoop()
-        {
-            using (Graphics g = Graphics.FromImage(backBuffer))
-            {
-                //g.Clear(background);
-                float para = 50;
-                float xD = ((1 - (player.position.X / backBuffer.Width)) * para) - para;
-                float yD = ((1 - (player.position.Y / backBuffer.Height)) * para) - para;
-                g.DrawImage(backgroundImage, xD, yD, backBuffer.Width + para, backBuffer.Height + para);
-
-                foreach (var p in platforms)
-                    p.Draw(g);
-
-                foreach (var entity in entities)
-                    entity.Draw(g);
-            }
-
-            area.DrawImageUnscaled(backBuffer, 0, 0);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -323,22 +215,38 @@ namespace Platformer
                     float vx = float.Parse(parts[3]);
                     float vy = float.Parse(parts[4]);
 
-                    Entity ent = entities.FirstOrDefault(a => a.id == id);
+                    // Find or create networked entity
+                    var networkedEntities = world.GetEntities<Networked>();
+                    int networkEntity = -1;
 
-                    if (ent == null)
+                    foreach (var entity in networkedEntities)
                     {
-                        ent = new Entity();
-                        ent.id = id;
-                        addEntity(ent);
+                        var networked = world.GetComponent<Networked>(entity);
+                        if (networked.NetworkId == id)
+                        {
+                            networkEntity = entity;
+                            break;
+                        }
                     }
 
-                    ent.position.X = x;
-                    ent.position.Y = y;
+                    if (networkEntity == -1)
+                    {
+                        networkEntity = world.CreateEntity();
+                        world.AddComponent(networkEntity, new Transform(new Vector(x, y), new Size(20, 20)));
+                        world.AddComponent(networkEntity, new Renderable { Color = Color.Blue });
+                        world.AddComponent(networkEntity, new Networked { NetworkId = id });
+                    }
+
+                    var transform = world.GetComponent<Transform>(networkEntity);
+                    transform.Position.X = x;
+                    transform.Position.Y = y;
+                    transform.Velocity.X = vx;
+                    transform.Velocity.Y = vy;
+                    world.SetComponent(networkEntity, transform);
                 }
             }
 
             client.listen("connect", handleData);
-
             client.listen("update", handleData);
         }
 
