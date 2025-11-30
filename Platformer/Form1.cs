@@ -32,12 +32,13 @@ namespace Platformer
 
         InputHandler input;
 
+        PhysicsEntity player;
         List<Entity> entities = new List<Entity>();
-        Entity player;
+
 
         List<Platform> platforms = new List<Platform>();
 
-        List<Entity> physics = new List<Entity>();
+        List<PhysicsEntity> physicsEntities = new List<PhysicsEntity>();
         List<Entity> collisions = new List<Entity>();
 
         SoundMachine soundMachine = new SoundMachine();
@@ -92,7 +93,7 @@ namespace Platformer
             {
                 Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
 
-                Entity newBullet = new Entity(Color.SteelBlue);
+                PhysicsEntity newBullet = new PhysicsEntity(Color.SteelBlue);
 
                 newBullet.position = new Vector(player.position);
                 newBullet.acceleration = new Vector(player.acceleration);
@@ -105,9 +106,13 @@ namespace Platformer
             }
         }
 
-        Entity addEntity(Entity entity)
+        T addEntity<T>(T entity) where T : Entity
         {
             entities.Add(entity);
+            if (entity is PhysicsEntity physEnt)
+            {
+                physicsEntities.Add(physEnt);
+            }
             return entity;
         }
 
@@ -123,7 +128,9 @@ namespace Platformer
                 menu.Enabled = menu.Visible;
             });
 
-            player = addEntity(new Entity());
+            player = new PhysicsEntity();
+            player.sprite.image = Properties.Resources.Player;
+            addEntity(player);
 
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
 
@@ -176,7 +183,7 @@ namespace Platformer
         }
 
         TimeSpan jumpCooldown = TimeSpan.FromMilliseconds(200);
-        void entityJump(Entity entity)
+        void entityJump(PhysicsEntity entity)
         {
             if (isGrounded(entity) && DateTime.Now - entity.lastJumpTime >= jumpCooldown)
             {
@@ -206,7 +213,7 @@ namespace Platformer
         float friction = 0.9f;
         void PhysicsLoop()
         {
-            foreach (var entity in entities)
+            foreach (var entity in physicsEntities)
             {
                 if (!isGrounded(entity))
                     entity.acceleration.Y += gravity;
@@ -224,7 +231,7 @@ namespace Platformer
             }
         }
 
-        void ResolveAxisCollision(Entity entity, bool axisX)
+        void ResolveAxisCollision(PhysicsEntity entity, bool axisX)
         {
             RectangleF rect = new RectangleF(
                 entity.position.X,
@@ -339,11 +346,11 @@ namespace Platformer
                     float vx = float.Parse(parts[3]);
                     float vy = float.Parse(parts[4]);
 
-                    Entity ent = entities.FirstOrDefault(a => a.id == id);
+                    PhysicsEntity ent = physicsEntities.FirstOrDefault(a => a.id == id);
 
                     if (ent == null)
                     {
-                        ent = new Entity();
+                        ent = new PhysicsEntity();
                         ent.id = id;
                         addEntity(ent);
                     }
