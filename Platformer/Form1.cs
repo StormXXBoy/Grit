@@ -32,9 +32,10 @@ namespace Platformer
 
         InputHandler input;
 
-        PhysicsEntity player;
+        PlayerEntity player;
         List<Entity> entities = new List<Entity>();
 
+        List<PlayerEntity> playerEntities = new List<PlayerEntity>();
         List<PhysicsEntity> physicsEntities = new List<PhysicsEntity>();
         List<ICollidable> collisionEntities = new List<ICollidable>();
 
@@ -73,7 +74,6 @@ namespace Platformer
                 }
                 else
                 {
-                    addEntity(new CollisionEntity(350, 200, 200, 20));
                     Point start = bufferPoint.Value;
                     Point end = e.Location;
 
@@ -82,7 +82,7 @@ namespace Platformer
                     int w = Math.Abs(end.X - start.X);
                     int h = Math.Abs(end.Y - start.Y);
 
-                    addEntity(new CollisionEntity(x, y, w, h));
+                    addEntity(new PlatformEntity(x, y, w, h));
                     bufferPoint = null;
                 }
             }
@@ -129,26 +129,31 @@ namespace Platformer
                 menu.Enabled = menu.Visible;
             });
 
-            player = new PhysicsEntity();
+            player = new PlayerEntity();
             player.sprite.image = Properties.Resources.Player;
             addEntity(player);
 
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
 
-            addEntity(new CollisionEntity(100, gameBounds.Height - 30, 200, 20));
-            addEntity(new CollisionEntity(350, 200, 200, 20));
+            addEntity(new PlatformEntity(100, gameBounds.Height - 30, 200, 20));
+            addEntity(new PlatformEntity(350, 200, 200, 20));
 
             StartLoop();
         }
 
         DateTime lastUpdate;
+        float currentFPS = 0;
+        public static float Lerp(float a, float b, float t)
+        {
+            return a + (b - a) * t;
+        }
 
         void StartLoop()
         {
             lastUpdate = DateTime.Now;
 
             System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-            timer.Interval = 16; // ~60 FPS
+            timer.Interval = 16;
             timer.Tick += TimerTick;
             timer.Start();
         }
@@ -159,13 +164,15 @@ namespace Platformer
             float dt = (float)(now - lastUpdate).TotalSeconds;
             lastUpdate = now;
 
+            FPScounter.Text = (Lerp((1f / dt), dt, 0.01f)).ToString("0") + " FPS";
+
             Loop(dt);
         }
 
         void Loop(float dt)
         {
             HandleInput(dt);
-            PhysicsLoop();
+            PhysicsLoop(dt);
             UpdateNetwork();
             DrawLoop();
         }
@@ -212,29 +219,49 @@ namespace Platformer
 
         float gravity = 0.2f;
         float friction = 0.9f;
-        void PhysicsLoop()
+        //void PhysicsLoop(float dt)
+        //{
+        //    foreach (var entity in physicsEntities)
+        //    {
+        //        if (!isGrounded(entity))
+        //            entity.acceleration.Y += gravity;
+
+        //        entity.velocity += entity.acceleration;
+
+        //        entity.acceleration *= friction;
+        //        entity.velocity *= friction;
+
+        //        entity.position.X += entity.velocity.X;
+        //        ResolveAxisCollision(entity, axisX: true);
+
+        //        entity.position.Y += entity.velocity.Y;
+        //        ResolveAxisCollision(entity, axisX: false);
+        //    }
+        //}
+        void PhysicsLoop(float dt)
         {
-            foreach (var entity in physicsEntities)
+            dt *= 40f;
+
+            int subSteps = 3;
+            dt /= subSteps;
+
+            for (int step = 0; step < subSteps; step++)
             {
-                if (!isGrounded(entity))
-                    entity.acceleration.Y += gravity;
+                foreach (var entity in physicsEntities)
+                {
+                    if (!isGrounded(entity))
+                        entity.acceleration.Y += gravity * dt;
 
-                entity.velocity += entity.acceleration;
+                    entity.velocity += entity.acceleration * dt;
+                    entity.acceleration *= (float)Math.Pow(friction, dt);
+                    entity.velocity *= (float)Math.Pow(friction, dt);
 
-                entity.acceleration *= friction;
-                entity.velocity *= friction;
+                    entity.position.Y += entity.velocity.Y * dt;
+                    ResolveAxisCollision(entity, axisX: false);
 
-                entity.position.X += entity.velocity.X;
-                ResolveAxisCollision(entity, axisX: true);
-
-                entity.position.Y += entity.velocity.Y;
-                ResolveAxisCollision(entity, axisX: false);
-            }
-
-            foreach (var entity in physicsEntities)
-            {
-                ResolveAxisCollision(entity, axisX: false);
-                ResolveAxisCollision(entity, axisX: true);
+                    entity.position.X += entity.velocity.X * dt;
+                    ResolveAxisCollision(entity, axisX: true);
+                }
             }
         }
 
@@ -371,13 +398,18 @@ namespace Platformer
 
             client.listen("update", handleData);
         }
+        private void HostButton_Click(object sender, EventArgs e)
+        {
+            Server.Program serverProgram = new Server.Program();
+            serverProgram.Start();
+            Connect_Click(null, null);
+        }
 
         private void TestButton_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Test button clicked");
-            Server.Program serverProgram = new Server.Program();
-            serverProgram.Start();
-            Connect_Click(null, null);
+            soundMachine.LoadSound("track03", "sounds/track03.mp3");
+            soundMachine.Play("track03");
         }
     }
 }

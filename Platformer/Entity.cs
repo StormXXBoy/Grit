@@ -46,12 +46,11 @@ namespace Platformer
     {
         public string id = Guid.NewGuid().ToString();
 
-        public int health = 100;
-        public float speed = 1;
         public Color color = Color.HotPink;
 
         public Size size = new Size(10, 20);
         public Vector position = new Vector(0, 0);
+        public Vector center => new Vector(position.X + size.Width / 2, position.Y + size.Height / 2);
 
         public DateTime lastJumpTime = DateTime.MinValue;
 
@@ -82,11 +81,6 @@ namespace Platformer
 
         public PhysicsEntity() : base() { }
         public PhysicsEntity(Color color) : base(color) { }
-
-        public void MoveHorizontal(float dt, int dir)
-        {
-            this.acceleration.X += (dir ^ 0) * this.speed * dt;
-        }
     }
 
     interface ICollidable
@@ -98,16 +92,38 @@ namespace Platformer
     {
         public RectangleF bounds => new RectangleF(position.X, position.Y, size.Width, size.Height);
 
-        public CollisionEntity() : base()
-        {
-            sprite = new Sprite(Platformer.Properties.Resources.brick);
-        }
+        public CollisionEntity() : base() {}
 
         public CollisionEntity(float x, float y, float width, float height)
         {
             position = new Vector(x, y);
             size = new Size((int)width, (int)height);
-            sprite = new Sprite(Platformer.Properties.Resources.brick);
+        }
     }
+
+    class PlayerEntity : PhysicsEntity
+    {
+        public int health = 100;
+        public float speed = 1;
+
+        public void MoveHorizontal(float dt, int dir)
+        {
+            this.acceleration.X += (dir ^ 0) * this.speed * dt;
+        }
+    }
+
+    class PlatformEntity : CollisionEntity
+    {
+        public PlatformEntity() : base()
+        {
+            sprite = new Sprite(Platformer.Properties.Resources.brick);
+        }
+
+        public PlatformEntity(float x, float y, float width, float height)
+        {
+            position = new Vector(x, y);
+            size = new Size((int)width, (int)height);
+            sprite = new Sprite(Platformer.Properties.Resources.brick);
+        }
     }
 }

@@ -88,7 +88,6 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="InputHandler.cs" />
-    <Compile Include="Platform.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SoundMachine.cs" />
@@ -131,6 +130,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="sounds\track03.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="sounds\track05.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="sounds\boing.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
