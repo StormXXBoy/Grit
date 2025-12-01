@@ -83,10 +83,31 @@ namespace Platformer
         public PhysicsEntity() : base() { }
         public PhysicsEntity(Color color) : base(color) { }
 
-
         public void MoveHorizontal(float dt, int dir)
         {
             this.acceleration.X += (dir ^ 0) * this.speed * dt;
         }
+    }
+
+    interface ICollidable
+    {
+        RectangleF bounds { get; }
+    }
+
+    class CollisionEntity : Entity, ICollidable
+    {
+        public RectangleF bounds => new RectangleF(position.X, position.Y, size.Width, size.Height);
+
+        public CollisionEntity() : base()
+        {
+            sprite = new Sprite(Platformer.Properties.Resources.brick);
+        }
+
+        public CollisionEntity(float x, float y, float width, float height)
+        {
+            position = new Vector(x, y);
+            size = new Size((int)width, (int)height);
+            sprite = new Sprite(Platformer.Properties.Resources.brick);
+    }
     }
 }

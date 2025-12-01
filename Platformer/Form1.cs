@@ -35,11 +35,8 @@ namespace Platformer
         PhysicsEntity player;
         List<Entity> entities = new List<Entity>();
 
-
-        List<Platform> platforms = new List<Platform>();
-
         List<PhysicsEntity> physicsEntities = new List<PhysicsEntity>();
-        List<Entity> collisions = new List<Entity>();
+        List<ICollidable> collisionEntities = new List<ICollidable>();
 
         SoundMachine soundMachine = new SoundMachine();
 
@@ -76,7 +73,7 @@ namespace Platformer
                 }
                 else
                 {
-                    platforms.Add(new Platform(350, 200, 200, 20));
+                    addEntity(new CollisionEntity(350, 200, 200, 20));
                     Point start = bufferPoint.Value;
                     Point end = e.Location;
 
@@ -85,7 +82,7 @@ namespace Platformer
                     int w = Math.Abs(end.X - start.X);
                     int h = Math.Abs(end.Y - start.Y);
 
-                    platforms.Add(new Platform(x, y, w, h));
+                    addEntity(new CollisionEntity(x, y, w, h));
                     bufferPoint = null;
                 }
             }
@@ -93,9 +90,9 @@ namespace Platformer
             {
                 Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
 
-                PhysicsEntity newBullet = new PhysicsEntity(Color.SteelBlue);
+                PhysicsEntity newBullet = new PhysicsEntity();
 
-                newBullet.position = new Vector(player.position);
+                newBullet.position = new Vector(player.position) - new Vector(0, 10);
                 newBullet.acceleration = new Vector(player.acceleration);
                 newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
                 //player.velocity += (shootDirection.normalize() * 50f);
@@ -112,6 +109,10 @@ namespace Platformer
             if (entity is PhysicsEntity physEnt)
             {
                 physicsEntities.Add(physEnt);
+            }
+            if (entity is ICollidable colEnt)
+            {
+                collisionEntities.Add(colEnt);
             }
             return entity;
         }
@@ -134,8 +135,8 @@ namespace Platformer
 
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
 
-            platforms.Add(new Platform(100, gameBounds.Height - 30, 200, 20));
-            platforms.Add(new Platform(350, 200, 200, 20));
+            addEntity(new CollisionEntity(100, gameBounds.Height - 30, 200, 20));
+            addEntity(new CollisionEntity(350, 200, 200, 20));
 
             StartLoop();
         }
@@ -173,7 +174,7 @@ namespace Platformer
         {
             RectangleF feet = new RectangleF(entity.position.X, entity.position.Y + entity.size.Height, entity.size.Width, 1);
 
-            foreach (var p in platforms)
+            foreach (var p in collisionEntities)
             {
                 if (feet.IntersectsWith(p.bounds))
                     return true;
@@ -229,6 +230,12 @@ namespace Platformer
                 entity.position.Y += entity.velocity.Y;
                 ResolveAxisCollision(entity, axisX: false);
             }
+
+            foreach (var entity in physicsEntities)
+            {
+                ResolveAxisCollision(entity, axisX: false);
+                ResolveAxisCollision(entity, axisX: true);
+            }
         }
 
         void ResolveAxisCollision(PhysicsEntity entity, bool axisX)
@@ -240,17 +247,18 @@ namespace Platformer
                 entity.size.Height
             );
 
-            foreach (var p in platforms)
+            foreach (var collisionEnt in collisionEntities)
             {
-                if (!rect.IntersectsWith(p.bounds))
-                    continue;
+                if (collisionEnt == entity) continue;
+
+                if (!rect.IntersectsWith(collisionEnt.bounds)) continue;
 
                 if (axisX)
                 {
                     if (entity.velocity.X > 0)
-                        entity.position.X = p.bounds.X - entity.size.Width;
+                        entity.position.X = collisionEnt.bounds.X - entity.size.Width;
                     else if (entity.velocity.X < 0)
-                        entity.position.X = p.bounds.X + p.bounds.Width;
+                        entity.position.X = collisionEnt.bounds.X + collisionEnt.bounds.Width;
 
                     entity.velocity.X *= -0.7f;
                     entity.acceleration.X = 0;
@@ -258,9 +266,9 @@ namespace Platformer
                 else
                 {
                     if (entity.velocity.Y > 0)
-                        entity.position.Y = p.bounds.Y - entity.size.Height;
+                        entity.position.Y = collisionEnt.bounds.Y - entity.size.Height;
                     else if (entity.velocity.Y < 0)
-                        entity.position.Y = p.bounds.Y + p.bounds.Height;
+                        entity.position.Y = collisionEnt.bounds.Y + collisionEnt.bounds.Height;
 
                     entity.velocity.Y = 0;
                     entity.acceleration.Y = 0;
@@ -284,14 +292,14 @@ namespace Platformer
             if (entity.position.X + entity.size.Width > gameBounds.Width)
             {
                 entity.position.X = gameBounds.Width - entity.size.Width;
-                entity.velocity.X = 0;
+                entity.velocity.X *= -2;
                 entity.acceleration.X = 0;
             }
 
             if (entity.position.X < 0)
             {
                 entity.position.X = 0;
-                entity.velocity.X = 0;
+                entity.velocity.X *= -2;
                 entity.acceleration.X = 0;
             }
         }
@@ -305,9 +313,6 @@ namespace Platformer
                 float xD = ((1 - (player.position.X / backBuffer.Width)) * para) - para;
                 float yD = ((1 - (player.position.Y / backBuffer.Height)) * para) - para;
                 g.DrawImage(backgroundImage, xD, yD, backBuffer.Width + para, backBuffer.Height + para);
-
-                foreach (var p in platforms)
-                    p.Draw(g);
 
                 foreach (var entity in entities)
                     entity.Draw(g);
