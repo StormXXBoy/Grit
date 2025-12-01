@@ -1,83 +1,92 @@
-﻿using System;
+﻿using Netwerkr;
+using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace Server
 {
-    class Program
+    class clientData
     {
-        static List<TcpClient> clients = new List<TcpClient>();
+        public string clientId;
+        public string posX = "0";
+        public string posY = "0";
+        public string velX = "0";
+        public string velY = "0";
 
-        static void Main()
+        public clientData(string id)
         {
-            TcpListener server = new TcpListener(IPAddress.Any, 5000);
-            server.Start();
-            Console.WriteLine("Server running...");
-
-            while (true)
-            {
-                TcpClient client = server.AcceptTcpClient();
-                clients.Add(client);
-
-                Console.WriteLine("Client connected.");
-                Thread thread = new Thread(() => HandleClient(client));
-                thread.Start();
-            }
+            clientId = id;
         }
 
-        static void HandleClient(TcpClient client)
+        public override string ToString()
         {
-            NetworkStream stream = client.GetStream();
-            byte[] buffer = new byte[1024];
+            return $"{clientId}/{posX}/{posY}/{velX}/{velY}";
+        }
+    }
 
-            void broadcast(string message)
+    public class Program
+    {
+        private Netwerkr.Netwerkr net = new Netwerkr.Netwerkr();
+
+        public void Start()
+        {
+            NetwerkrServer server = net.startServer();
+            server.Start();
+
+            List<clientData> clientsData = new List<clientData>();
+
+            string clientsDataExept(string clientId)
             {
-                byte[] data = Encoding.UTF8.GetBytes(message);
-
-                foreach (var c in clients.ToArray())
+                string dataToSend = "";
+                foreach (var item in clientsData)
                 {
-                    if (c == client) continue;
-                    try
-                    {
-                        NetworkStream s = c.GetStream();
-                        s.Write(data, 0, data.Length);
-                    }
-                    catch
-                    {
-                        clients.Remove(c);
-                    }
+                    if (item.clientId == clientId) continue;
+                    dataToSend += item.ToString() + "|";
                 }
+                dataToSend = dataToSend.TrimEnd('|');
+                return dataToSend;
             }
 
-            broadcast("A new client has connected.");
-
-            try
+            server.clientConnected = (clientId) =>
             {
-                while (true)
+                Console.WriteLine($"Client connected: {clientId}");
+                server.fireClient(clientId, "connect", clientsDataExept(clientId));
+                clientsData.Add(new clientData(clientId));
+            };
+
+            server.listen("update", (clientId, data) =>
+            {
+                Console.WriteLine($"Received update from {clientId}: {data}");
+                var parts = data.Split('/');
+                var clientDataItem = clientsData.Find(c => c.clientId == clientId);
+                if (clientDataItem != null)
                 {
-                    int byteCount = stream.Read(buffer, 0, buffer.Length);
-
-                    if (byteCount == 0)
-                        break;
-
-                    string data = Encoding.UTF8.GetString(buffer, 0, byteCount);
-                    Console.WriteLine("Received: " + data);
-
-                    broadcast("e");
+                    clientDataItem.posX = parts[0];
+                    clientDataItem.posY = parts[1];
+                    clientDataItem.velX = parts[2];
+                    clientDataItem.velY = parts[3];
                 }
-            }
-            catch (Exception ex)
+            });
+
+            System.Timers.Timer broadcastTimer = new System.Timers.Timer(10);
+            broadcastTimer.Start();
+
+            broadcastTimer.Elapsed += (sender, e) =>
             {
-                Console.WriteLine("Client disconnected with error: " + ex.Message);
-            }
-            finally
+                foreach (var item in clientsData)
+                {
+                    server.fireClient(item.clientId, "update", clientsDataExept(item.clientId));
+                }
+            };
+        }
+
+        static void Main(string[] args)
+        {
+            Program p = new Program();
+            p.Start();
+            while (true)
             {
-                clients.Remove(client);
-                client.Close();
-                Console.WriteLine("Client fully removed.");
+                System.Threading.Thread.Sleep(10);
             }
         }
     }

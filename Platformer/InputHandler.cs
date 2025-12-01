@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Platformer
 {
-    internal class InputHandler
+    public class InputHandler
     {
         private HashSet<Keys> keysDown = new HashSet<Keys>();
         private readonly Dictionary<Keys, Action> keyDownEvents = new Dictionary<Keys, Action>();
@@ -25,6 +25,14 @@ namespace Platformer
                 keyDownEvents[key] = null;
 
             keyDownEvents[key] += action;
+        }
+
+        public void SubscribeKeyUp(Keys key, Action action)
+        {
+            if (!keyUpEvents.ContainsKey(key))
+                keyUpEvents[key] = null;
+
+            keyUpEvents[key] += action;
         }
 
         private void HandleKeyDown(object sender, KeyEventArgs e)
@@ -45,6 +53,11 @@ namespace Platformer
         public bool IsKeyDown(Keys key)
         {
             return keysDown.Contains(key);
+        }
+
+        public bool IsKeyUp(Keys key)
+        {
+            return !IsKeyDown(key);
         }
     }
 }

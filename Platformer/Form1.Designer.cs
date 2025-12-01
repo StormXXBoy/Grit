@@ -30,7 +30,10 @@
         {
             this.gameScreen = new System.Windows.Forms.PictureBox();
             this.menu = new System.Windows.Forms.Panel();
+            this.TestButton = new System.Windows.Forms.Button();
+            this.ConnectButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).BeginInit();
+            this.menu.SuspendLayout();
             this.SuspendLayout();
             // 
             // gameScreen
@@ -47,10 +50,35 @@
             // 
             // menu
             // 
+            this.menu.Controls.Add(this.TestButton);
+            this.menu.Controls.Add(this.ConnectButton);
             this.menu.Location = new System.Drawing.Point(50, 50);
             this.menu.Name = "menu";
             this.menu.Size = new System.Drawing.Size(400, 400);
             this.menu.TabIndex = 1;
+            this.menu.Visible = false;
+            // 
+            // TestButton
+            // 
+            this.TestButton.Location = new System.Drawing.Point(322, 345);
+            this.TestButton.Name = "TestButton";
+            this.TestButton.Size = new System.Drawing.Size(75, 23);
+            this.TestButton.TabIndex = 1;
+            this.TestButton.Text = "Test";
+            this.TestButton.UseVisualStyleBackColor = true;
+            this.TestButton.Click += new System.EventHandler(this.TestButton_Click);
+            // 
+            // ConnectButton
+            // 
+            this.ConnectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ConnectButton.AutoSize = true;
+            this.ConnectButton.Location = new System.Drawing.Point(311, 374);
+            this.ConnectButton.Name = "ConnectButton";
+            this.ConnectButton.Size = new System.Drawing.Size(86, 23);
+            this.ConnectButton.TabIndex = 0;
+            this.ConnectButton.Text = "Connect Local";
+            this.ConnectButton.UseVisualStyleBackColor = true;
+            this.ConnectButton.Click += new System.EventHandler(this.Connect_Click);
             // 
             // Form1
             // 
@@ -59,9 +87,12 @@
             this.ClientSize = new System.Drawing.Size(584, 561);
             this.Controls.Add(this.menu);
             this.Controls.Add(this.gameScreen);
+            this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).EndInit();
+            this.menu.ResumeLayout(false);
+            this.menu.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -70,6 +101,8 @@
 
         private System.Windows.Forms.PictureBox gameScreen;
         private System.Windows.Forms.Panel menu;
+        private System.Windows.Forms.Button ConnectButton;
+        private System.Windows.Forms.Button TestButton;
     }
 }
 

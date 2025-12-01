@@ -7,79 +7,86 @@ using System.Threading.Tasks;
 
 namespace Platformer
 {
-    class Vector
+    class Sprite
     {
-        public float X = 0;
-        public float Y = 0;
+        public Bitmap image;
 
-        public Vector() { }
-
-        public Vector(object x, object y)
+        private Color _color = Color.HotPink;
+        public Color color
         {
-            X = Convert.ToSingle(x);
-            Y = Convert.ToSingle(y);
+            get => _color;
+            set
+            {
+                _color = value;
+                brush = new SolidBrush(_color);
+            }
         }
 
-        public Vector(Vector other)
+        public Brush brush = Brushes.HotPink;
+
+        public Sprite() { }
+
+        public Sprite(Bitmap img)
         {
-            X = other.X;
-            Y = other.Y;
+            image = img;
         }
 
-        public float magnitude()
+        public Sprite(Brush b)
         {
-            return (float)Math.Sqrt(X * X + Y * Y);
+            brush = b;
         }
 
-        public Vector normalize()
+        public Sprite(Color c)
         {
-            float mag = this.magnitude();
-            if (mag == 0) return new Vector(0, 0);
-            return new Vector(X / mag, Y / mag);
+            color = c;
         }
-
-        public static Vector operator +(Vector a, Vector b) { return new Vector(a.X + b.X, a.Y + b.Y); }
-        public static Vector operator -(Vector a, Vector b) { return new Vector(a.X - b.X, a.Y - b.Y); }
-        public static Vector operator *(Vector a, float scalar) { return new Vector(a.X * scalar, a.Y * scalar); }
     }
 
     internal class Entity
     {
+        public string id = Guid.NewGuid().ToString();
+
         public int health = 100;
         public float speed = 1;
         public Color color = Color.HotPink;
 
         public Size size = new Size(10, 20);
         public Vector position = new Vector(0, 0);
-        public Vector acceleration = new Vector(0, 0);
-        public Vector velocity = new Vector(0, 0);
 
         public DateTime lastJumpTime = DateTime.MinValue;
 
-        private Pen pen;
-        private Brush brush;
+        public Sprite sprite = new Sprite();
 
-        public Entity()
-        {
-            pen = new Pen(color);
-            brush = new SolidBrush(color);
-        }
+        public Entity() { }
 
         public Entity(Color newColor)
         {
-            color = newColor;
-            pen = new Pen(color);
-            brush = new SolidBrush(color);
+            sprite.color = newColor;
         }
 
         public void Draw(Graphics graphics)
         {
-            graphics.FillRectangle(brush, position.X, position.Y, size.Width, size.Height);
+            if (sprite.image != null)
+            {
+                graphics.DrawImage(sprite.image, position.X, position.Y, size.Width, size.Height);
+                return;
+            }
+            graphics.FillRectangle(sprite.brush, position.X, position.Y, size.Width, size.Height);
         }
+    }
+
+    class PhysicsEntity : Entity
+    {
+        public Vector acceleration = new Vector(0, 0);
+        public Vector velocity = new Vector(0, 0);
+
+        public PhysicsEntity() : base() { }
+        public PhysicsEntity(Color color) : base(color) { }
+
 
         public void MoveHorizontal(float dt, int dir)
         {
-            this.acceleration.X += (dir^0) * this.speed * dt;
+            this.acceleration.X += (dir ^ 0) * this.speed * dt;
         }
     }
 }

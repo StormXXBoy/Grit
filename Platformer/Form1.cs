@@ -1,6 +1,7 @@
 ﻿using NAudio;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using Netwerkr;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,6 +20,9 @@ namespace Platformer
 {
     public partial class Form1 : Form
     {
+        public Netwerkr.Netwerkr net = new Netwerkr.Netwerkr();
+        public NetwerkrClient client;
+
         Size gameBounds = new Size(500, 500);
         Graphics area;
         Bitmap backgroundImage = Properties.Resources.background;
@@ -28,16 +32,21 @@ namespace Platformer
 
         InputHandler input;
 
+        PhysicsEntity player;
         List<Entity> entities = new List<Entity>();
-        Entity player;
+
 
         List<Platform> platforms = new List<Platform>();
+
+        List<PhysicsEntity> physicsEntities = new List<PhysicsEntity>();
+        List<Entity> collisions = new List<Entity>();
 
         SoundMachine soundMachine = new SoundMachine();
 
         public Form1()
         {
             InitializeComponent();
+
             this.Load += (s, e) => Start();
             this.Resize += (s, e) => onResize();
             gameScreen.MouseDown += (s, e) => HandleClick(s, e);
@@ -84,11 +93,12 @@ namespace Platformer
             {
                 Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
 
-                Entity newBullet = new Entity(Color.SteelBlue);
+                PhysicsEntity newBullet = new PhysicsEntity(Color.SteelBlue);
 
                 newBullet.position = new Vector(player.position);
                 newBullet.acceleration = new Vector(player.acceleration);
                 newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
+                //player.velocity += (shootDirection.normalize() * 50f);
 
                 newBullet.size = new Size(10, 10);
 
@@ -96,9 +106,13 @@ namespace Platformer
             }
         }
 
-        Entity addEntity(Entity entity)
+        T addEntity<T>(T entity) where T : Entity
         {
             entities.Add(entity);
+            if (entity is PhysicsEntity physEnt)
+            {
+                physicsEntities.Add(physEnt);
+            }
             return entity;
         }
 
@@ -108,16 +122,20 @@ namespace Platformer
             backBuffer = new Bitmap(gameBounds.Width, gameBounds.Height);
 
             input = new InputHandler(this);
-            input.SubscribeKeyDown(Keys.Escape, () => { menu.Visible = !menu.Visible; });
+            input.SubscribeKeyDown(Keys.Escape, () => {
+                this.ActiveControl = null;
+                menu.Visible = !menu.Visible;
+                menu.Enabled = menu.Visible;
+            });
 
-            player = addEntity(new Entity());
+            player = new PhysicsEntity();
+            player.sprite.image = Properties.Resources.Player;
+            addEntity(player);
 
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
 
             platforms.Add(new Platform(100, gameBounds.Height - 30, 200, 20));
             platforms.Add(new Platform(350, 200, 200, 20));
-
-            addEntity(new Entity());
 
             StartLoop();
         }
@@ -147,6 +165,7 @@ namespace Platformer
         {
             HandleInput(dt);
             PhysicsLoop();
+            UpdateNetwork();
             DrawLoop();
         }
 
@@ -164,11 +183,11 @@ namespace Platformer
         }
 
         TimeSpan jumpCooldown = TimeSpan.FromMilliseconds(200);
-        void entityJump(Entity entity)
+        void entityJump(PhysicsEntity entity)
         {
             if (isGrounded(entity) && DateTime.Now - entity.lastJumpTime >= jumpCooldown)
             {
-                entity.acceleration.Y -= gravity * 10;
+                entity.acceleration.Y -= 2;
                 entity.lastJumpTime = DateTime.Now;
                 //soundMachine.Play("jump");
             }
@@ -194,7 +213,7 @@ namespace Platformer
         float friction = 0.9f;
         void PhysicsLoop()
         {
-            foreach (var entity in entities)
+            foreach (var entity in physicsEntities)
             {
                 if (!isGrounded(entity))
                     entity.acceleration.Y += gravity;
@@ -212,7 +231,7 @@ namespace Platformer
             }
         }
 
-        void ResolveAxisCollision(Entity entity, bool axisX)
+        void ResolveAxisCollision(PhysicsEntity entity, bool axisX)
         {
             RectangleF rect = new RectangleF(
                 entity.position.X,
@@ -261,6 +280,20 @@ namespace Platformer
                 entity.velocity.Y = 0;
                 entity.acceleration.Y = 0;
             }
+
+            if (entity.position.X + entity.size.Width > gameBounds.Width)
+            {
+                entity.position.X = gameBounds.Width - entity.size.Width;
+                entity.velocity.X = 0;
+                entity.acceleration.X = 0;
+            }
+
+            if (entity.position.X < 0)
+            {
+                entity.position.X = 0;
+                entity.velocity.X = 0;
+                entity.acceleration.X = 0;
+            }
         }
 
         void DrawLoop()
@@ -281,6 +314,65 @@ namespace Platformer
             }
 
             area.DrawImageUnscaled(backBuffer, 0, 0);
+        }
+
+        void UpdateNetwork()
+        {
+            if (client == null) return;
+            string data = $"{player.position.X}/{player.position.Y}/{player.velocity.X}/{player.velocity.Y}";
+            client.fire("update", data);
+        }
+
+        private void Connect_Click(object sender, EventArgs e)
+        {
+            client = net.startClient("127.0.0.1");
+
+            void handleData(string data)
+            {
+                if (string.IsNullOrWhiteSpace(data)) return;
+
+                string[] clientsData = data.Split('|');
+
+                foreach (var entry in clientsData)
+                {
+                    if (string.IsNullOrWhiteSpace(entry)) continue;
+
+                    var parts = entry.Split('/');
+                    if (parts.Length != 5) continue;
+
+                    string id = parts[0];
+                    float x = float.Parse(parts[1]);
+                    float y = float.Parse(parts[2]);
+                    float vx = float.Parse(parts[3]);
+                    float vy = float.Parse(parts[4]);
+
+                    PhysicsEntity ent = physicsEntities.FirstOrDefault(a => a.id == id);
+
+                    if (ent == null)
+                    {
+                        ent = new PhysicsEntity();
+                        ent.id = id;
+                        addEntity(ent);
+                    }
+
+                    ent.position.X = x;
+                    ent.position.Y = y;
+                    ent.velocity.X = vx;
+                    ent.velocity.Y = vy;
+                }
+            }
+
+            client.listen("connect", handleData);
+
+            client.listen("update", handleData);
+        }
+
+        private void TestButton_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("Test button clicked");
+            Server.Program serverProgram = new Server.Program();
+            serverProgram.Start();
+            Connect_Click(null, null);
         }
     }
 }
