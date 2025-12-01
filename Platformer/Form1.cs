@@ -19,6 +19,7 @@ namespace Platformer
 {
     public partial class Form1 : Form
     {
+        Size gameBounds = new Size(500, 500);
         Graphics area;
         Bitmap backgroundImage = Properties.Resources.background;
         Bitmap backBuffer;
@@ -38,7 +39,21 @@ namespace Platformer
         {
             InitializeComponent();
             this.Load += (s, e) => Start();
-            this.MouseDown += (s, e) => HandleClick(s, e);
+            this.Resize += (s, e) => onResize();
+            gameScreen.MouseDown += (s, e) => HandleClick(s, e);
+
+            onResize();
+        }
+
+        void onResize() {
+            void centerControl(Control control)
+            {
+                control.Left = (this.ClientSize.Width - control.Width) / 2;
+                control.Top = (this.ClientSize.Height - control.Height) / 2;
+            }
+
+            centerControl(gameScreen);
+            centerControl(menu);
         }
 
         Point? bufferPoint = null;
@@ -56,7 +71,6 @@ namespace Platformer
                     Point start = bufferPoint.Value;
                     Point end = e.Location;
 
-                    // width & height based on drag
                     int x = Math.Min(start.X, end.X);
                     int y = Math.Min(start.Y, end.Y);
                     int w = Math.Abs(end.X - start.X);
@@ -90,15 +104,17 @@ namespace Platformer
 
         void Start()
         {
-            area = this.CreateGraphics();
-            backBuffer = new Bitmap((int)area.VisibleClipBounds.Width, (int)area.VisibleClipBounds.Height);
+            area = gameScreen.CreateGraphics();
+            backBuffer = new Bitmap(gameBounds.Width, gameBounds.Height);
 
             input = new InputHandler(this);
+            input.SubscribeKeyDown(Keys.Escape, () => { menu.Visible = !menu.Visible; });
+
             player = addEntity(new Entity());
 
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
 
-            platforms.Add(new Platform(100, area.VisibleClipBounds.Height - 30, 200, 20));
+            platforms.Add(new Platform(100, gameBounds.Height - 30, 200, 20));
             platforms.Add(new Platform(350, 200, 200, 20));
 
             addEntity(new Entity());
@@ -144,7 +160,7 @@ namespace Platformer
                     return true;
             }
 
-            return entity.position.Y + entity.size.Height >= area.VisibleClipBounds.Height;
+            return entity.position.Y + entity.size.Height >= gameBounds.Height;
         }
 
         TimeSpan jumpCooldown = TimeSpan.FromMilliseconds(200);
@@ -239,9 +255,9 @@ namespace Platformer
                 );
             }
 
-            if (entity.position.Y + entity.size.Height > area.VisibleClipBounds.Height)
+            if (entity.position.Y + entity.size.Height > gameBounds.Height)
             {
-                entity.position.Y = area.VisibleClipBounds.Height - entity.size.Height;
+                entity.position.Y = gameBounds.Height - entity.size.Height;
                 entity.velocity.Y = 0;
                 entity.acceleration.Y = 0;
             }

@@ -10,6 +10,8 @@ namespace Platformer
     internal class InputHandler
     {
         private HashSet<Keys> keysDown = new HashSet<Keys>();
+        private readonly Dictionary<Keys, Action> keyDownEvents = new Dictionary<Keys, Action>();
+        private readonly Dictionary<Keys, Action> keyUpEvents = new Dictionary<Keys, Action>();
 
         public InputHandler(Form form)
         {
@@ -17,13 +19,27 @@ namespace Platformer
             form.KeyUp += HandleKeyUp;
         }
 
+        public void SubscribeKeyDown(Keys key, Action action)
+        {
+            if (!keyDownEvents.ContainsKey(key))
+                keyDownEvents[key] = null;
+
+            keyDownEvents[key] += action;
+        }
+
         private void HandleKeyDown(object sender, KeyEventArgs e)
         {
-            keysDown.Add(e.KeyCode);
+            if (keysDown.Add(e.KeyCode))
+            {
+                if (keyDownEvents.TryGetValue(e.KeyCode, out var action)) action?.Invoke();
+            }
         }
         private void HandleKeyUp(object sender, KeyEventArgs e)
         {
-            keysDown.Remove(e.KeyCode);
+            if (keysDown.Remove(e.KeyCode))
+            {
+                if (keyUpEvents.TryGetValue(e.KeyCode, out var action)) action?.Invoke();
+            }
         }
 
         public bool IsKeyDown(Keys key)
