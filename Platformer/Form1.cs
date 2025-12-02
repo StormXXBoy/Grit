@@ -136,12 +136,17 @@ namespace Platformer
             player.sprite.image = Properties.Resources.Player;
             addEntity(player);
 
+
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
 
             luaEngine.RegisterObject("player", player);
             luaEngine.RunFile("scripts/main.lua");
 
             luaEngine?.Call("init");
+            input.SubscribeInputEvent((info) =>
+            {
+                luaEngine?.Call("input", info);
+            });
 
             addEntity(new PlatformEntity(100, gameBounds.Height - 30, 200, 20));
             addEntity(new PlatformEntity(350, 200, 200, 20));
@@ -161,7 +166,7 @@ namespace Platformer
             lastUpdate = DateTime.Now;
 
             System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-            timer.Interval = 16;
+            timer.Interval = 1;
             timer.Tick += TimerTick;
             timer.Start();
         }

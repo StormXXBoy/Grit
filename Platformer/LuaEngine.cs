@@ -15,6 +15,7 @@ public class LuaEngine
         //this.RegisterFunction("print", (Action<string>)((input) => { Console.WriteLine(input); })); // Bruh I thought I had to define a print
 
         UserData.RegisterType<Vector>();
+        UserData.RegisterType<InputInfo>();
 
         var vectorTable = DynValue.NewTable(script);
         vectorTable.Table.Set("new", DynValue.NewCallback((ctx, args) =>
