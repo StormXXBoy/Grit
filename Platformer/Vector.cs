@@ -37,6 +37,11 @@ namespace Platformer
             return new Vector(X / mag, Y / mag);
         }
 
+        public override string ToString()
+        {
+            return $"{this.X.ToString()}, {this.Y.ToString()}";
+        }
+
         public static Vector operator +(Vector a, Vector b) { return new Vector(a.X + b.X, a.Y + b.Y); }
         public static Vector operator -(Vector a, Vector b) { return new Vector(a.X - b.X, a.Y - b.Y); }
         public static Vector operator *(Vector a, float scalar) { return new Vector(a.X * scalar, a.Y * scalar); }

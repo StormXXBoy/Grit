@@ -1,4 +1,5 @@
-﻿using NAudio;
+﻿using MoonSharp.Interpreter;
+using NAudio;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using Netwerkr;
@@ -27,6 +28,8 @@ namespace Platformer
         Graphics area;
         Bitmap backgroundImage = Properties.Resources.background;
         Bitmap backBuffer;
+
+        LuaEngine luaEngine = new LuaEngine();
 
         Color background = Color.White;
 
@@ -97,7 +100,7 @@ namespace Platformer
                 newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
                 //player.velocity += (shootDirection.normalize() * 50f);
 
-                newBullet.size = new Size(10, 10);
+                newBullet.size = new Vector(10, 10);
 
                 addEntity(newBullet);
             }
@@ -134,6 +137,11 @@ namespace Platformer
             addEntity(player);
 
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
+
+            luaEngine.RegisterObject("player", player);
+            luaEngine.RunFile("scripts/main.lua");
+
+            luaEngine?.Call("init");
 
             addEntity(new PlatformEntity(100, gameBounds.Height - 30, 200, 20));
             addEntity(new PlatformEntity(350, 200, 200, 20));
@@ -175,11 +183,13 @@ namespace Platformer
             PhysicsLoop(dt);
             UpdateNetwork();
             DrawLoop();
+
+            luaEngine?.Call("update", dt);
         }
 
         bool isGrounded(Entity entity)
         {
-            RectangleF feet = new RectangleF(entity.position.X, entity.position.Y + entity.size.Height, entity.size.Width, 1);
+            RectangleF feet = new RectangleF(entity.position.X, entity.position.Y + entity.size.Y, entity.size.X, 1);
 
             foreach (var p in collisionEntities)
             {
@@ -187,7 +197,7 @@ namespace Platformer
                     return true;
             }
 
-            return entity.position.Y + entity.size.Height >= gameBounds.Height;
+            return entity.position.Y + entity.size.Y >= gameBounds.Height;
         }
 
         TimeSpan jumpCooldown = TimeSpan.FromMilliseconds(200);
@@ -270,8 +280,8 @@ namespace Platformer
             RectangleF rect = new RectangleF(
                 entity.position.X,
                 entity.position.Y,
-                entity.size.Width,
-                entity.size.Height
+                entity.size.X,
+                entity.size.Y
             );
 
             foreach (var collisionEnt in collisionEntities)
@@ -283,7 +293,7 @@ namespace Platformer
                 if (axisX)
                 {
                     if (entity.velocity.X > 0)
-                        entity.position.X = collisionEnt.bounds.X - entity.size.Width;
+                        entity.position.X = collisionEnt.bounds.X - entity.size.X;
                     else if (entity.velocity.X < 0)
                         entity.position.X = collisionEnt.bounds.X + collisionEnt.bounds.Width;
 
@@ -293,7 +303,7 @@ namespace Platformer
                 else
                 {
                     if (entity.velocity.Y > 0)
-                        entity.position.Y = collisionEnt.bounds.Y - entity.size.Height;
+                        entity.position.Y = collisionEnt.bounds.Y - entity.size.Y;
                     else if (entity.velocity.Y < 0)
                         entity.position.Y = collisionEnt.bounds.Y + collisionEnt.bounds.Height;
 
@@ -304,21 +314,21 @@ namespace Platformer
                 rect = new RectangleF(
                     entity.position.X,
                     entity.position.Y,
-                    entity.size.Width,
-                    entity.size.Height
+                    entity.size.X,
+                    entity.size.Y
                 );
             }
 
-            if (entity.position.Y + entity.size.Height > gameBounds.Height)
+            if (entity.position.Y + entity.size.Y > gameBounds.Height)
             {
-                entity.position.Y = gameBounds.Height - entity.size.Height;
+                entity.position.Y = gameBounds.Height - entity.size.Y;
                 entity.velocity.Y = 0;
                 entity.acceleration.Y = 0;
             }
 
-            if (entity.position.X + entity.size.Width > gameBounds.Width)
+            if (entity.position.X + entity.size.X > gameBounds.Width)
             {
-                entity.position.X = gameBounds.Width - entity.size.Width;
+                entity.position.X = gameBounds.Width - entity.size.X;
                 entity.velocity.X *= -2;
                 entity.acceleration.X = 0;
             }

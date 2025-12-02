@@ -48,9 +48,9 @@ namespace Platformer
 
         public Color color = Color.HotPink;
 
-        public Size size = new Size(10, 20);
+        public Vector size = new Vector(10, 20);
         public Vector position = new Vector(0, 0);
-        public Vector center => new Vector(position.X + size.Width / 2, position.Y + size.Height / 2);
+        public Vector center => new Vector(position.X + size.X / 2, position.Y + size.Y / 2);
 
         public DateTime lastJumpTime = DateTime.MinValue;
 
@@ -67,10 +67,10 @@ namespace Platformer
         {
             if (sprite.image != null)
             {
-                graphics.DrawImage(sprite.image, position.X, position.Y, size.Width, size.Height);
+                graphics.DrawImage(sprite.image, position.X, position.Y, size.X, size.Y);
                 return;
             }
-            graphics.FillRectangle(sprite.brush, position.X, position.Y, size.Width, size.Height);
+            graphics.FillRectangle(sprite.brush, position.X, position.Y, size.X, size.Y);
         }
     }
 
@@ -90,14 +90,14 @@ namespace Platformer
 
     class CollisionEntity : Entity, ICollidable
     {
-        public RectangleF bounds => new RectangleF(position.X, position.Y, size.Width, size.Height);
+        public RectangleF bounds => new RectangleF(position.X, position.Y, size.X, size.Y);
 
         public CollisionEntity() : base() {}
 
         public CollisionEntity(float x, float y, float width, float height)
         {
             position = new Vector(x, y);
-            size = new Size((int)width, (int)height);
+            size = new Vector(width, height);
         }
     }
 
@@ -122,7 +122,7 @@ namespace Platformer
         public PlatformEntity(float x, float y, float width, float height)
         {
             position = new Vector(x, y);
-            size = new Size((int)width, (int)height);
+            size = new Vector(width, height);
             sprite = new Sprite(Platformer.Properties.Resources.brick);
         }
     }
