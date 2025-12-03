@@ -10,7 +10,7 @@ namespace Platformer
     public enum InputState
     {
         Down,
-        Presses,
+        Pressed,
         Up
     }
 
@@ -34,7 +34,7 @@ namespace Platformer
             state = State;
             key = Key;
             button = MouseButtons.None;
-            position = Vector.Zero;
+            position = Vector.zero;
         }
 
         public InputInfo(InputType Type, InputState State, MouseButtons Button, Vector Position)
@@ -59,17 +59,20 @@ namespace Platformer
         private readonly Dictionary<Keys, Action> keyUpEvents = new Dictionary<Keys, Action>();
         private readonly List<Action<InputInfo>> inputEvents = new List<Action<InputInfo>>();
 
-        private MouseMessageFilter mouseFilter = new MouseMessageFilter();
+        //private MouseMessageFilter mouseFilter = new MouseMessageFilter();
 
-        public InputHandler(Form form)
+        public InputHandler(Form form, Control screen)
         {
             form.KeyDown += HandleKeyDown;
             form.KeyUp += HandleKeyUp;
 
-            Application.AddMessageFilter(mouseFilter);
+            screen.MouseDown += (s, e) => HandleMouseDown(e.Button, e.X, e.Y);
+            screen.MouseUp += (s, e) => HandleMouseUp(e.Button, e.X, e.Y);
 
-            mouseFilter.MouseDown += HandleMouseDown;
-            mouseFilter.MouseUp += HandleMouseUp;
+            //Application.AddMessageFilter(mouseFilter); // Use this to capture mouse events globally but nah ima just use gamescreen's mouse events
+
+            //mouseFilter.MouseDown += HandleMouseDown;
+            //mouseFilter.MouseUp += HandleMouseUp;
         }
 
         private void handleInputEvent(InputInfo info)
@@ -80,22 +83,22 @@ namespace Platformer
             }
         }
 
-        public void SubscribeInputEvent(Action<InputInfo> action)
+        public void subscribeInputEvent(Action<InputInfo> action)
         {
             inputEvents.Add(action);
         }
 
-        public bool IsKeyDown(Keys key)
+        public bool isKeyDown(Keys key)
         {
             return keysDown.Contains(key);
         }
 
-        public bool IsKeyUp(Keys key)
+        public bool isKeyUp(Keys key)
         {
-            return !IsKeyDown(key);
+            return !isKeyDown(key);
         }
 
-        public void SubscribeKeyDown(Keys key, Action action)
+        public void subscribeKeyDown(Keys key, Action action)
         {
             if (!keyDownEvents.ContainsKey(key))
                 keyDownEvents[key] = null;
@@ -103,7 +106,7 @@ namespace Platformer
             keyDownEvents[key] += action;
         }
 
-        public void SubscribeKeyUp(Keys key, Action action)
+        public void subscribeKeyUp(Keys key, Action action)
         {
             if (!keyUpEvents.ContainsKey(key))
                 keyUpEvents[key] = null;
@@ -115,17 +118,17 @@ namespace Platformer
         {
             if (keysDown.Add(e.KeyCode))
             {
-                handleInputEvent(new InputInfo(InputType.Key, InputState.Down, e.KeyCode));
                 if (keyDownEvents.TryGetValue(e.KeyCode, out var action)) action?.Invoke();
+                handleInputEvent(new InputInfo(InputType.Key, InputState.Down, e.KeyCode));
             }
         }
         private void HandleKeyUp(object sender, KeyEventArgs e)
         {
-            handleInputEvent(new InputInfo(InputType.Key, InputState.Up, e.KeyCode));
             if (keysDown.Remove(e.KeyCode))
             {
                 if (keyUpEvents.TryGetValue(e.KeyCode, out var action)) action?.Invoke();
             }
+            handleInputEvent(new InputInfo(InputType.Key, InputState.Up, e.KeyCode));
         }
         private void HandleMouseDown(MouseButtons btn, int x, int y)
         {

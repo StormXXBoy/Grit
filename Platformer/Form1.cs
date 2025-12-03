@@ -91,18 +91,18 @@ namespace Platformer
             }
             else
             {
-                Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
+                //Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
 
-                PhysicsEntity newBullet = new PhysicsEntity();
+                //PhysicsEntity newBullet = new PhysicsEntity();
 
-                newBullet.position = new Vector(player.position) - new Vector(0, 10);
-                newBullet.acceleration = new Vector(player.acceleration);
-                newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
-                //player.velocity += (shootDirection.normalize() * 50f);
+                //newBullet.position = new Vector(player.center) - new Vector(0, 10);
+                //newBullet.acceleration = new Vector(player.acceleration);
+                //newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
+                ////player.velocity += (shootDirection.normalize() * 50f);
 
-                newBullet.size = new Vector(10, 10);
+                //newBullet.size = new Vector(10, 10);
 
-                addEntity(newBullet);
+                //addEntity(newBullet);
             }
         }
 
@@ -120,13 +120,30 @@ namespace Platformer
             return entity;
         }
 
+        void initLua()
+        {
+            luaEngine.RegisterObject("player", player);
+            luaEngine.RegisterObject("input", input);
+
+            luaEngine.RegisterFunction("addEntity", (Func<Entity, Entity>)((ent) => addEntity(ent)));
+
+            luaEngine.RunFile("scripts/main.lua");
+
+            luaEngine?.Call("init");
+
+            input.subscribeInputEvent((info) =>
+            {
+                luaEngine?.Call("onInput", info);
+            });
+        }
+
         void Start()
         {
             area = gameScreen.CreateGraphics();
             backBuffer = new Bitmap(gameBounds.Width, gameBounds.Height);
 
-            input = new InputHandler(this);
-            input.SubscribeKeyDown(Keys.Escape, () => {
+            input = new InputHandler(this, gameScreen);
+            input.subscribeKeyDown(Keys.Escape, () => {
                 this.ActiveControl = null;
                 menu.Visible = !menu.Visible;
                 menu.Enabled = menu.Visible;
@@ -136,20 +153,12 @@ namespace Platformer
             player.sprite.image = Properties.Resources.Player;
             addEntity(player);
 
-
             soundMachine.LoadSound("jump", "sounds/jump.mp3");
-
-            luaEngine.RegisterObject("player", player);
-            luaEngine.RunFile("scripts/main.lua");
-
-            luaEngine?.Call("init");
-            input.SubscribeInputEvent((info) =>
-            {
-                luaEngine?.Call("input", info);
-            });
 
             addEntity(new PlatformEntity(100, gameBounds.Height - 30, 200, 20));
             addEntity(new PlatformEntity(350, 200, 200, 20));
+
+            initLua();
 
             StartLoop();
         }
@@ -218,15 +227,15 @@ namespace Platformer
 
         void HandleInput(float dt)
         {
-            if (input.IsKeyDown(Keys.Right) || input.IsKeyDown(Keys.D))
+            if (input.isKeyDown(Keys.Right) || input.isKeyDown(Keys.D))
             {
                 player.MoveHorizontal(dt, 1);
             }
-            if (input.IsKeyDown(Keys.Left) || input.IsKeyDown(Keys.Q))
+            if (input.isKeyDown(Keys.Left) || input.isKeyDown(Keys.Q))
             {
                 player.MoveHorizontal(dt, -1);
             }
-            if (input.IsKeyDown(Keys.Up) || input.IsKeyDown(Keys.Space))
+            if (input.isKeyDown(Keys.Up) || input.isKeyDown(Keys.Space))
             {
                 entityJump(player);
             }
@@ -315,13 +324,6 @@ namespace Platformer
                     entity.velocity.Y = 0;
                     entity.acceleration.Y = 0;
                 }
-
-                rect = new RectangleF(
-                    entity.position.X,
-                    entity.position.Y,
-                    entity.size.X,
-                    entity.size.Y
-                );
             }
 
             if (entity.position.Y + entity.size.Y > gameBounds.Height)

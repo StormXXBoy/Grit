@@ -11,7 +11,8 @@ namespace Platformer
         public float X = 0;
         public float Y = 0;
 
-        public static readonly Vector Zero = new Vector(0, 0);
+        public static readonly Vector zero = new Vector(0, 0);
+        public static readonly Vector one = new Vector(1, 1);
 
         public Vector() { }
 

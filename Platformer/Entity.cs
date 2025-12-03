@@ -50,7 +50,24 @@ namespace Platformer
 
         public Vector size = new Vector(10, 20);
         public Vector position = new Vector(0, 0);
-        public Vector center => new Vector(position.X + size.X / 2, position.Y + size.Y / 2);
+
+        public Vector center {
+            get
+            {
+                return new Vector(position.X + size.X / 2, position.Y + size.Y / 2);
+            }
+            set
+            {
+                position = new Vector(value.X - size.X / 2, value.Y - size.Y / 2);
+            }
+        }
+        public Vector bottomCenter => new Vector(position.X + size.X / 2, position.Y + size.Y);
+        public void sizeAndCenter(Vector Size)
+        {
+            Vector oldCenter = center;
+            size = Size;
+            position = new Vector(oldCenter.X - size.X / 2, oldCenter.Y - size.Y / 2);
+        }
 
         public DateTime lastJumpTime = DateTime.MinValue;
 
