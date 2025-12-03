@@ -122,9 +122,11 @@ namespace Platformer
 
         void initLua()
         {
+            //luaEngine.RegisterObject("entities", entities);
             luaEngine.RegisterObject("player", player);
             luaEngine.RegisterObject("input", input);
 
+            luaEngine.RegisterFunction("entities", (Func<List<Entity>>)(() => entities));
             luaEngine.RegisterFunction("addEntity", (Func<Entity, Entity>)((ent) => addEntity(ent)));
 
             luaEngine.RunFile("scripts/main.lua");

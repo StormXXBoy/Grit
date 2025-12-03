@@ -16,7 +16,9 @@ public class LuaEngine
 
         //this.RegisterFunction("print", (Action<string>)((input) => { Console.WriteLine(input); })); // Bruh I thought I had to define a print
 
+        UserData.RegisterType<System.Drawing.Color>();
         RegisterEnum<KnownColor>("Color");
+        RegisterFunction("color", (Func<KnownColor, Color>)((kc) => Color.FromKnownColor(kc)));
 
         UserData.RegisterType<InputInfo>();
         RegisterEnum<InputState>("InputState");
@@ -35,8 +37,12 @@ public class LuaEngine
             return UserData.Create(new Vector(x, y));
         });
 
+        UserData.RegisterType<Sprite>();
         UserData.RegisterType<Entity>();
         UserData.RegisterType<PhysicsEntity>();
+        UserData.RegisterType<CollisionEntity>();
+        UserData.RegisterType<PlayerEntity>();
+        UserData.RegisterType<PlatformEntity>();
         var entityTable = DynValue.NewTable(script);
         entityTable.Table.Set("base", DynValue.NewCallback((ctx, args) =>
         {
