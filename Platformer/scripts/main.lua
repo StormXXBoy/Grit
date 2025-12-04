@@ -1,5 +1,6 @@
 local startEnt
 local newBullet = Entity.physics()
+local elevator = Entity.platform()
 
 function init()
 	startEnt = Entity.base();
@@ -8,14 +9,17 @@ function init()
 	startEnt.size = Vector(15, 15);
 	addEntity(startEnt);
 	addEntity(newBullet);
+	elevator.size = Vector(100, 20);
+	addEntity(elevator);
 end
 
-function  update(dt)
+function update(dt)
 	--print(player.size, player.position)
 	if (newBullet.center - startEnt.center).magnitude() < 15 then
 		player.position = Vector(0, 500)
 		player.velocity = Vector(0, 0)
 	end
+	elevator.center = Vector(250, 250 - math.sin(os.clock() * 0.5) * 250)
 end
 
 function onInput(inputInfo)
@@ -38,7 +42,7 @@ function onInput(inputInfo)
 	end
 
 	if (inputInfo.key == Enum.Key.T and inputInfo.state == Enum.InputState.Down) then
-		for i, v in pairs(entities()) do
+		for i, v in pairs(Entities.collision()) do
 			print(i, v)
 		end
 	end

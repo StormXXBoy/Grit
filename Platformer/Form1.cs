@@ -126,7 +126,12 @@ namespace Platformer
             luaEngine.RegisterObject("player", player);
             luaEngine.RegisterObject("input", input);
 
-            luaEngine.RegisterFunction("entities", (Func<List<Entity>>)(() => entities));
+            var entitiesTable = DynValue.NewTable(luaEngine.script);
+            entitiesTable.Table.Set("all", luaEngine.createFunction((Func<List<Entity>>)(() => entities)));
+            entitiesTable.Table.Set("physics", luaEngine.createFunction((Func<List<PhysicsEntity>>)(() => physicsEntities)));
+            entitiesTable.Table.Set("collision", luaEngine.createFunction((Func<List<ICollidable>>)(() => collisionEntities)));
+            luaEngine.script.Globals["Entities"] = entitiesTable;
+
             luaEngine.RegisterFunction("addEntity", (Func<Entity, Entity>)((ent) => addEntity(ent)));
 
             luaEngine.RunFile("scripts/main.lua");

@@ -1,8 +1,10 @@
 ﻿using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.CoreLib;
 using Platformer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 
 public class LuaEngine
@@ -19,6 +21,8 @@ public class LuaEngine
         UserData.RegisterType<System.Drawing.Color>();
         RegisterEnum<KnownColor>("Color");
         RegisterFunction("color", (Func<KnownColor, Color>)((kc) => Color.FromKnownColor(kc)));
+
+        //RegisterFunction("time", (Func<float>)(() => OsTimeModule));
 
         UserData.RegisterType<InputInfo>();
         RegisterEnum<InputState>("InputState");
@@ -44,26 +48,11 @@ public class LuaEngine
         UserData.RegisterType<PlayerEntity>();
         UserData.RegisterType<PlatformEntity>();
         var entityTable = DynValue.NewTable(script);
-        entityTable.Table.Set("base", DynValue.NewCallback((ctx, args) =>
-        {
-            return UserData.Create(new Entity());
-        }));
-        entityTable.Table.Set("physics", DynValue.NewCallback((ctx, args) =>
-        {
-            return UserData.Create(new PhysicsEntity());
-        }));
-        entityTable.Table.Set("collision", DynValue.NewCallback((ctx, args) =>
-        {
-            return UserData.Create(new CollisionEntity());
-        }));
-        entityTable.Table.Set("player", DynValue.NewCallback((ctx, args) =>
-        {
-            return UserData.Create(new PlayerEntity());
-        }));
-        entityTable.Table.Set("platform", DynValue.NewCallback((ctx, args) =>
-        {
-            return UserData.Create(new PlatformEntity());
-        }));
+        entityTable.Table.Set("base", createFunction((Func<DynValue>)(() => { return UserData.Create(new Entity()); })));
+        entityTable.Table.Set("physics", createFunction((Func<DynValue>)(() => { return UserData.Create(new PhysicsEntity()); })));
+        entityTable.Table.Set("collision", createFunction((Func<DynValue>)(() => { return UserData.Create(new CollisionEntity()); })));
+        entityTable.Table.Set("player", createFunction((Func<DynValue>)(() => { return UserData.Create(new PlayerEntity()); })));
+        entityTable.Table.Set("platform", createFunction((Func<DynValue>)(() => { return UserData.Create(new PlatformEntity()); })));
         script.Globals["Entity"] = entityTable;
     }
 
@@ -74,18 +63,9 @@ public class LuaEngine
     }
     public void RegisterFunction(string name, Delegate del)
     {
-        script.Globals[name] = DynValue.NewCallback((context, args) =>
-        {
-            object[] realArgs = new object[args.Count];
-            for (int i = 0; i < args.Count; i++)
-                realArgs[i] = args[i].ToObject();
-
-            var result = del.DynamicInvoke(realArgs);
-
-            return DynValue.FromObject(script, result);
-        });
+        script.Globals[name] = createFunction(del);
     }
-
+    
     public void RegisterEnum<T>(string name) where T : Enum
     {
         UserData.RegisterType<T>();
@@ -105,6 +85,20 @@ public class LuaEngine
         }
 
         enumRoot[name] = table;
+    }
+
+    public DynValue createFunction(Delegate del)
+    {
+        return DynValue.NewCallback((context, args) =>
+        {
+            object[] realArgs = new object[args.Count];
+            for (int i = 0; i < args.Count; i++)
+                realArgs[i] = args[i].ToObject();
+
+            var result = del.DynamicInvoke(realArgs);
+
+            return DynValue.FromObject(script, result);
+        });
     }
 
     public void RunFile(string path)
