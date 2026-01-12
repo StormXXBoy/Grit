@@ -120,6 +120,20 @@ namespace Platformer
             return entity;
         }
 
+        T removeEntity<T>(T entity) where T : Entity
+        {
+            entities.Remove(entity);
+            if (entity is PhysicsEntity physEnt)
+            {
+                physicsEntities.Remove(physEnt);
+            }
+            if (entity is ICollidable colEnt)
+            {
+                collisionEntities.Remove(colEnt);
+            }
+            return entity;
+        }
+
         void initLua()
         {
             //luaEngine.RegisterObject("entities", entities);
@@ -133,6 +147,7 @@ namespace Platformer
             luaEngine.script.Globals["Entities"] = entitiesTable;
 
             luaEngine.RegisterFunction("addEntity", (Func<Entity, Entity>)((ent) => addEntity(ent)));
+            luaEngine.RegisterFunction("removeEntity", (Func<Entity, Entity>)((ent) => removeEntity(ent)));
 
             luaEngine.RunFile("scripts/main.lua");
 
@@ -280,8 +295,7 @@ namespace Platformer
             {
                 foreach (var entity in physicsEntities)
                 {
-                    if (!isGrounded(entity))
-                        entity.acceleration.Y += gravity * dt;
+                    if (!isGrounded(entity)) entity.acceleration.Y += gravity * dt;
 
                     entity.velocity += entity.acceleration * dt;
                     entity.acceleration *= (float)Math.Pow(friction, dt);
@@ -298,39 +312,48 @@ namespace Platformer
 
         void ResolveAxisCollision(PhysicsEntity entity, bool axisX)
         {
-            RectangleF rect = new RectangleF(
+            RectangleF entRect = new RectangleF(
                 entity.position.X,
                 entity.position.Y,
                 entity.size.X,
                 entity.size.Y
             );
 
-            foreach (var collisionEnt in collisionEntities)
+            foreach (var col in collisionEntities)
             {
-                if (collisionEnt == entity) continue;
+                if (col == entity) continue;
+                RectangleF colRect = col.bounds;
 
-                if (!rect.IntersectsWith(collisionEnt.bounds)) continue;
+                if (!entRect.IntersectsWith(colRect))
+                    continue;
+
+                if (entity.position.Y + entity.size.Y < 0) continue;
+
+                float overlapLeft = (entRect.Right - colRect.Left);
+                float overlapRight = (colRect.Right - entRect.Left);
+                float overlapTop = (entRect.Bottom - colRect.Top);
+                float overlapBottom = (colRect.Bottom - entRect.Top);
+
+                float moveX = (overlapLeft < overlapRight) ? -overlapLeft : overlapRight;
+                float moveY = (overlapTop < overlapBottom) ? -overlapTop : overlapBottom;
 
                 if (axisX)
                 {
-                    if (entity.velocity.X > 0)
-                        entity.position.X = collisionEnt.bounds.X - entity.size.X;
-                    else if (entity.velocity.X < 0)
-                        entity.position.X = collisionEnt.bounds.X + collisionEnt.bounds.Width;
+                    if (Math.Abs(moveY) < 0.1) continue;
 
+                    entity.position.X += moveX;
                     entity.velocity.X *= -0.7f;
                     entity.acceleration.X = 0;
                 }
                 else
                 {
-                    if (entity.velocity.Y > 0)
-                        entity.position.Y = collisionEnt.bounds.Y - entity.size.Y;
-                    else if (entity.velocity.Y < 0)
-                        entity.position.Y = collisionEnt.bounds.Y + collisionEnt.bounds.Height;
-
-                    entity.velocity.Y = 0;
+                    entity.position.Y += moveY;
+                    entity.velocity.Y += moveY;
                     entity.acceleration.Y = 0;
                 }
+
+                entRect.X = entity.position.X;
+                entRect.Y = entity.position.Y;
             }
 
             if (entity.position.Y + entity.size.Y > gameBounds.Height)
@@ -354,6 +377,66 @@ namespace Platformer
                 entity.acceleration.X = 0;
             }
         }
+
+
+        //void ResolveAxisCollision(PhysicsEntity entity, bool axisX)
+        //{
+        //    RectangleF rect = new RectangleF(
+        //        entity.position.X,
+        //        entity.position.Y,
+        //        entity.size.X,
+        //        entity.size.Y
+        //    );
+
+        //    foreach (var collisionEnt in collisionEntities)
+        //    {
+        //        if (collisionEnt == entity) continue;
+
+        //        if (!rect.IntersectsWith(collisionEnt.bounds)) continue;
+
+        //        if (axisX)
+        //        {
+        //            if (entity.velocity.X > 0)
+        //                entity.position.X = collisionEnt.bounds.X - entity.size.X;
+        //            else if (entity.velocity.X < 0)
+        //                entity.position.X = collisionEnt.bounds.X + collisionEnt.bounds.Width;
+
+        //            entity.velocity.X *= -0.7f;
+        //            entity.acceleration.X = 0;
+        //        }
+        //        else
+        //        {
+        //            if (entity.velocity.Y > 0)
+        //                entity.position.Y = collisionEnt.bounds.Y - entity.size.Y;
+        //            else if (entity.velocity.Y < 0)
+        //                entity.position.Y = collisionEnt.bounds.Y + collisionEnt.bounds.Height;
+
+        //            entity.velocity.Y = 0;
+        //            entity.acceleration.Y = 0;
+        //        }
+        //    }
+
+        //    if (entity.position.Y + entity.size.Y > gameBounds.Height)
+        //    {
+        //        entity.position.Y = gameBounds.Height - entity.size.Y;
+        //        entity.velocity.Y = 0;
+        //        entity.acceleration.Y = 0;
+        //    }
+
+        //    if (entity.position.X + entity.size.X > gameBounds.Width)
+        //    {
+        //        entity.position.X = gameBounds.Width - entity.size.X;
+        //        entity.velocity.X *= -2;
+        //        entity.acceleration.X = 0;
+        //    }
+
+        //    if (entity.position.X < 0)
+        //    {
+        //        entity.position.X = 0;
+        //        entity.velocity.X *= -2;
+        //        entity.acceleration.X = 0;
+        //    }
+        //}
 
         void DrawLoop()
         {

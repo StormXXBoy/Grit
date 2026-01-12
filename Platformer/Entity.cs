@@ -89,6 +89,14 @@ namespace Platformer
             }
             graphics.FillRectangle(sprite.brush, position.X, position.Y, size.X, size.Y);
         }
+
+        public bool isTouching(Entity other)
+        {
+            return position.X < other.position.X + other.size.X &&
+                   position.X + size.X > other.position.X &&
+                   position.Y < other.position.Y + other.size.Y &&
+                   position.Y + size.Y > other.position.Y;
+        }
     }
 
     class PhysicsEntity : Entity

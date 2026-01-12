@@ -5,7 +5,7 @@ local elevator = Entity.platform()
 function init()
 	startEnt = Entity.base();
 	startEnt.sprite.color = color(Enum.Color.Lime);
-	startEnt.position = Vector(200, 100);
+	startEnt.position = Vector(200, 200);
 	startEnt.size = Vector(15, 15);
 	addEntity(startEnt);
 	addEntity(newBullet);
@@ -15,11 +15,12 @@ end
 
 function update(dt)
 	--print(player.size, player.position)
-	if (newBullet.center - startEnt.center).magnitude() < 15 then
-		player.position = Vector(0, 500)
-		player.velocity = Vector(0, 0)
+	if player.isTouching(startEnt) then
+		startEnt.sprite.color = color(Enum.Color.Red);
+		else
+		startEnt.sprite.color = color(Enum.Color.Lime);
 	end
-	elevator.center = Vector(250, 250 - math.sin(os.clock() * 0.5) * 250)
+	elevator.center = Vector(250, 250 - math.sin(os.clock() * 0.5) * 200)
 end
 
 function onInput(inputInfo)
@@ -30,6 +31,8 @@ function onInput(inputInfo)
 			player.velocity = Vector(0, 0)
 			return
 		end
+
+		--player.size = player.size * 1.1;
 
 		local shootDirection = inputInfo.position - player.position;
 
@@ -42,8 +45,10 @@ function onInput(inputInfo)
 	end
 
 	if (inputInfo.key == Enum.Key.T and inputInfo.state == Enum.InputState.Down) then
+		--removeEntity(elevator)
 		for i, v in pairs(Entities.collision()) do
 			print(i, v)
+			removeEntity(v)
 		end
 	end
 end
