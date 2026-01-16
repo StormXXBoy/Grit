@@ -7,6 +7,33 @@ using System.Drawing;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 
+public class LuaClient
+{
+    private Netwerkr.NetwerkrClient _client;
+
+    public LuaClient(Netwerkr.NetwerkrClient client)
+    {
+        _client = client;
+    }
+
+    public void listen(string eventName, DynValue callback)
+    {
+        if (callback.Type != DataType.Function)
+            throw new ScriptRuntimeException("callback must be a function");
+
+        _client.listen(eventName, data =>
+        {
+            // Call Lua function safely
+            callback.Function.Call(data);
+        });
+    }
+
+    public void fire(string eventName, string data)
+    {
+        _client.fire(eventName, data);
+    }
+}
+
 public class LuaEngine
 {
     public Script script;
@@ -17,6 +44,7 @@ public class LuaEngine
         script = new Script();
 
         //this.RegisterFunction("print", (Action<string>)((input) => { Console.WriteLine(input); })); // Bruh I thought I had to define a print
+        UserData.RegisterType<LuaClient>();
 
         UserData.RegisterType<System.Drawing.Color>();
         RegisterEnum<KnownColor>("Color");

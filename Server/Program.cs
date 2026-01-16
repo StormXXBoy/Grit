@@ -46,6 +46,11 @@ namespace Server
                 }
             });
 
+            server.listen("test", (clientId, data) =>
+            {
+                Console.WriteLine($"Received test from {clientId}: {data}");
+            });
+
             System.Timers.Timer broadcastTimer = new System.Timers.Timer(10);
             broadcastTimer.Start();
 

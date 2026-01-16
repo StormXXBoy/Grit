@@ -149,6 +149,7 @@ namespace Platformer
 
             luaEngine.RegisterFunction("addEntity", (Func<Entity, Entity>)((ent) => addEntity(ent)));
             luaEngine.RegisterFunction("removeEntity", (Func<Entity, Entity>)((ent) => removeEntity(ent)));
+            luaEngine.RegisterFunction("entityJump", (Action<PhysicsEntity>)((ent) => entityJump(ent)));
 
             luaEngine.RunFile("scripts/main.lua");
 
@@ -466,6 +467,7 @@ namespace Platformer
         private void Connect_Click(object sender, EventArgs e)
         {
             client = net.startClient("127.0.0.1");
+            luaEngine?.Call("serverConnected", new LuaClient(client));
 
             void handleData(string data)
             {

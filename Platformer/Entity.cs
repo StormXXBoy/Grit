@@ -133,7 +133,7 @@ namespace Platformer
 
         public void MoveHorizontal(float dt, int dir)
         {
-            this.acceleration.X += (dir ^ 0) * this.speed * dt;
+            this.acceleration.X += Math.Sign(dir) * this.speed * dt;
         }
     }
 

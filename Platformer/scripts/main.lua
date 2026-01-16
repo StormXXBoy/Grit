@@ -1,6 +1,7 @@
 local startEnt
 local newBullet = Entity.physics()
 local elevator = Entity.platform()
+local npc = Entity.player()
 
 function init()
 	startEnt = Entity.base();
@@ -11,6 +12,14 @@ function init()
 	addEntity(newBullet);
 	elevator.size = Vector(100, 20);
 	addEntity(elevator);
+	addEntity(npc)
+end
+
+function serverConnected(client)
+	client.listen("test", function(data)
+		print(data)
+	end)
+	client.fire("test", "cool test")
 end
 
 function update(dt)
@@ -21,6 +30,10 @@ function update(dt)
 		startEnt.sprite.color = color(Enum.Color.Lime);
 	end
 	elevator.center = Vector(250, 250 - math.sin(os.clock() * 0.5) * 200)
+	if math.abs(npc.center.x - player.center.x) > 20 then
+		npc.MoveHorizontal(dt, player.center.x - npc.center.x)
+		entityJump(npc)
+	end
 end
 
 function onInput(inputInfo)
