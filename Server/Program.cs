@@ -1,29 +1,11 @@
-﻿using Netwerkr;
+﻿using GritNetworking;
+using Netwerkr;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Server
 {
-    class clientData
-    {
-        public string clientId;
-        public string posX = "0";
-        public string posY = "0";
-        public string velX = "0";
-        public string velY = "0";
-
-        public clientData(string id)
-        {
-            clientId = id;
-        }
-
-        public override string ToString()
-        {
-            return $"{clientId}/{posX}/{posY}/{velX}/{velY}";
-        }
-    }
-
     public class Program
     {
         private Netwerkr.Netwerkr net = new Netwerkr.Netwerkr();
@@ -33,7 +15,7 @@ namespace Server
             NetwerkrServer server = net.startServer();
             server.Start();
 
-            List<clientData> clientsData = new List<clientData>();
+            List<NetEntity> clientsData = new List<NetEntity>();
 
             string clientsDataExept(string clientId)
             {
@@ -51,20 +33,16 @@ namespace Server
             {
                 Console.WriteLine($"Client connected: {clientId}");
                 server.fireClient(clientId, "connect", clientsDataExept(clientId));
-                clientsData.Add(new clientData(clientId));
+                clientsData.Add(new NetEntity(clientId));
             };
 
             server.listen("update", (clientId, data) =>
             {
                 Console.WriteLine($"Received update from {clientId}: {data}");
-                var parts = data.Split('/');
                 var clientDataItem = clientsData.Find(c => c.clientId == clientId);
                 if (clientDataItem != null)
                 {
-                    clientDataItem.posX = parts[0];
-                    clientDataItem.posY = parts[1];
-                    clientDataItem.velX = parts[2];
-                    clientDataItem.velY = parts[3];
+                    clientDataItem.UpdateFromString(data);
                 }
             });
 

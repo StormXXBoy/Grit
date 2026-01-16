@@ -127,6 +127,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GritNetworking\GritNetworking.csproj">
+      <Project>{bdfcf51b-89d1-4499-8d8e-71f6d31527ee}</Project>
+      <Name>GritNetworking</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Netwerkr\Netwerkr.csproj">
       <Project>{a09ed7cd-dc82-4765-857f-0ea3fd237124}</Project>
       <Name>Netwerkr</Name>

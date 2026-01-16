@@ -1,4 +1,5 @@
-﻿using MoonSharp.Interpreter;
+﻿using GritNetworking;
+using MoonSharp.Interpreter;
 using NAudio;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
@@ -458,8 +459,8 @@ namespace Platformer
         void UpdateNetwork()
         {
             if (client == null) return;
-            string data = $"{player.position.X}/{player.position.Y}/{player.velocity.X}/{player.velocity.Y}";
-            client.fire("update", data);
+            NetEntity netPlayer = new NetEntity(new netVector(player.position.X, player.position.Y), new netVector(player.velocity.X, player.velocity.Y));
+            client.fire("update", netPlayer.ToString());
         }
 
         private void Connect_Click(object sender, EventArgs e)
@@ -476,28 +477,22 @@ namespace Platformer
                 {
                     if (string.IsNullOrWhiteSpace(entry)) continue;
 
-                    var parts = entry.Split('/');
-                    if (parts.Length != 5) continue;
+                    NetEntity netEntity = new NetEntity();
+                    netEntity.UpdateFromString(entry, true);
 
-                    string id = parts[0];
-                    float x = float.Parse(parts[1]);
-                    float y = float.Parse(parts[2]);
-                    float vx = float.Parse(parts[3]);
-                    float vy = float.Parse(parts[4]);
-
-                    PhysicsEntity ent = physicsEntities.FirstOrDefault(a => a.id == id);
+                    PhysicsEntity ent = physicsEntities.FirstOrDefault(a => a.id == netEntity.clientId);
 
                     if (ent == null)
                     {
                         ent = new PhysicsEntity();
-                        ent.id = id;
+                        ent.id = netEntity.clientId;
                         addEntity(ent);
                     }
 
-                    ent.position.X = x;
-                    ent.position.Y = y;
-                    ent.velocity.X = vx;
-                    ent.velocity.Y = vy;
+                    ent.position.X = netEntity.position.x;
+                    ent.position.Y = netEntity.position.y;
+                    ent.velocity.X = netEntity.velocity.x;
+                    ent.velocity.Y = netEntity.velocity.y;
                 }
             }
 
