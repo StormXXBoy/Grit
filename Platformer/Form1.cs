@@ -476,7 +476,7 @@ namespace Platformer
 
         private void Connect_Click(object sender, EventArgs e)
         {
-            client = net.startClient("127.0.0.1");
+            client = net.startClient(ipInput.Text);
             luaEngine?.Call("serverConnected", new LuaClient(client));
 
             void handleData(string data)

@@ -34,6 +34,7 @@
             this.FPScounter = new System.Windows.Forms.Label();
             this.TestButton = new System.Windows.Forms.Button();
             this.ConnectButton = new System.Windows.Forms.Button();
+            this.ipInput = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).BeginInit();
             this.menu.SuspendLayout();
             this.SuspendLayout();
@@ -52,6 +53,7 @@
             // 
             // menu
             // 
+            this.menu.Controls.Add(this.ipInput);
             this.menu.Controls.Add(this.HostButton);
             this.menu.Controls.Add(this.FPScounter);
             this.menu.Controls.Add(this.TestButton);
@@ -105,6 +107,14 @@
             this.ConnectButton.UseVisualStyleBackColor = true;
             this.ConnectButton.Click += new System.EventHandler(this.Connect_Click);
             // 
+            // ipInput
+            // 
+            this.ipInput.Location = new System.Drawing.Point(219, 376);
+            this.ipInput.Name = "ipInput";
+            this.ipInput.Size = new System.Drawing.Size(86, 20);
+            this.ipInput.TabIndex = 4;
+            this.ipInput.Text = "127.0.0.1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -130,6 +140,7 @@
         private System.Windows.Forms.Button TestButton;
         private System.Windows.Forms.Label FPScounter;
         private System.Windows.Forms.Button HostButton;
+        private System.Windows.Forms.TextBox ipInput;
     }
 }
 
