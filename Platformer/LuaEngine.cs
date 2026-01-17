@@ -1,4 +1,5 @@
-﻿using MoonSharp.Interpreter;
+﻿using GritNetworking;
+using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.CoreLib;
 using Platformer;
 using System;
@@ -45,6 +46,27 @@ public class LuaEngine
 
         //this.RegisterFunction("print", (Action<string>)((input) => { Console.WriteLine(input); })); // Bruh I thought I had to define a print
         UserData.RegisterType<LuaClient>();
+        UserData.RegisterType<NetVector>();
+        UserData.RegisterType<NetEntity>();
+        var netTable = DynValue.NewTable(script);
+        netTable.Table.Set("vector", createFunction((Func<DynValue>)(() => { return UserData.Create(new NetVector()); })));
+        netTable.Table.Set("entity", createFunction((Func<DynValue>)(() => { return UserData.Create(new NetEntity()); })));
+        script.Globals["Net"] = netTable;
+
+        var stringTable = script.Globals.Get("string").Table;
+        stringTable.Set("split", DynValue.NewCallback((ctx, args) =>
+        {
+            string input = args[0].CastToString();
+            string sep = args.Count > 1 ? args[1].CastToString() : " ";
+
+            var table = new Table(script);
+
+            var parts = input.Split(new string[] { sep }, StringSplitOptions.None);
+            for (int i = 0; i < parts.Length; i++)
+                table.Set(i + 1, DynValue.NewString(parts[i])); // Lua is 1-based
+
+            return DynValue.NewTable(table);
+        }));
 
         UserData.RegisterType<System.Drawing.Color>();
         RegisterEnum<KnownColor>("Color");

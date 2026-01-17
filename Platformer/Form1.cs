@@ -51,7 +51,7 @@ namespace Platformer
 
             this.Load += (s, e) => Start();
             this.Resize += (s, e) => onResize();
-            gameScreen.MouseDown += (s, e) => HandleClick(s, e);
+            //gameScreen.MouseDown += (s, e) => HandleClick(s, e);
 
             onResize();
         }
@@ -67,45 +67,45 @@ namespace Platformer
             centerControl(menu);
         }
 
-        Point? bufferPoint = null;
-        void HandleClick(object s, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                if (bufferPoint == null)
-                {
-                    bufferPoint = e.Location;
-                }
-                else
-                {
-                    Point start = bufferPoint.Value;
-                    Point end = e.Location;
+        //Point? bufferPoint = null;
+        //void HandleClick(object s, MouseEventArgs e)
+        //{
+        //    if (e.Button == MouseButtons.Right)
+        //    {
+        //        //if (bufferPoint == null)
+        //        //{
+        //        //    bufferPoint = e.Location;
+        //        //}
+        //        //else
+        //        //{
+        //        //    Point start = bufferPoint.Value;
+        //        //    Point end = e.Location;
 
-                    int x = Math.Min(start.X, end.X);
-                    int y = Math.Min(start.Y, end.Y);
-                    int w = Math.Abs(end.X - start.X);
-                    int h = Math.Abs(end.Y - start.Y);
+        //        //    int x = Math.Min(start.X, end.X);
+        //        //    int y = Math.Min(start.Y, end.Y);
+        //        //    int w = Math.Abs(end.X - start.X);
+        //        //    int h = Math.Abs(end.Y - start.Y);
 
-                    addEntity(new PlatformEntity(x, y, w, h));
-                    bufferPoint = null;
-                }
-            }
-            else
-            {
-                //Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
+        //        //    addEntity(new PlatformEntity(x, y, w, h));
+        //        //    bufferPoint = null;
+        //        //}
+        //    }
+        //    else
+        //    {
+        //        //Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
 
-                //PhysicsEntity newBullet = new PhysicsEntity();
+        //        //PhysicsEntity newBullet = new PhysicsEntity();
 
-                //newBullet.position = new Vector(player.center) - new Vector(0, 10);
-                //newBullet.acceleration = new Vector(player.acceleration);
-                //newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
-                ////player.velocity += (shootDirection.normalize() * 50f);
+        //        //newBullet.position = new Vector(player.center) - new Vector(0, 10);
+        //        //newBullet.acceleration = new Vector(player.acceleration);
+        //        //newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
+        //        ////player.velocity += (shootDirection.normalize() * 50f);
 
-                //newBullet.size = new Vector(10, 10);
+        //        //newBullet.size = new Vector(10, 10);
 
-                //addEntity(newBullet);
-            }
-        }
+        //        //addEntity(newBullet);
+        //    }
+        //}
 
         T addEntity<T>(T entity) where T : Entity
         {
@@ -117,6 +117,10 @@ namespace Platformer
             if (entity is ICollidable colEnt)
             {
                 collisionEntities.Add(colEnt);
+            }
+            if (entity is PlayerEntity plrEnt)
+            {
+                playerEntities.Add(plrEnt);
             }
             return entity;
         }
@@ -132,6 +136,10 @@ namespace Platformer
             {
                 collisionEntities.Remove(colEnt);
             }
+            if (entity is PlayerEntity plrEnt)
+            {
+                playerEntities.Remove(plrEnt);
+            }
             return entity;
         }
 
@@ -145,6 +153,7 @@ namespace Platformer
             entitiesTable.Table.Set("all", luaEngine.createFunction((Func<List<Entity>>)(() => entities)));
             entitiesTable.Table.Set("physics", luaEngine.createFunction((Func<List<PhysicsEntity>>)(() => physicsEntities)));
             entitiesTable.Table.Set("collision", luaEngine.createFunction((Func<List<ICollidable>>)(() => collisionEntities)));
+            entitiesTable.Table.Set("players", luaEngine.createFunction((Func<List<PlayerEntity>>)(() => playerEntities)));
             luaEngine.script.Globals["Entities"] = entitiesTable;
 
             luaEngine.RegisterFunction("addEntity", (Func<Entity, Entity>)((ent) => addEntity(ent)));
@@ -188,7 +197,7 @@ namespace Platformer
         }
 
         DateTime lastUpdate;
-        float currentFPS = 0;
+        float currentFPS = 60;
         public static float Lerp(float a, float b, float t)
         {
             return a + (b - a) * t;
@@ -210,7 +219,8 @@ namespace Platformer
             float dt = (float)(now - lastUpdate).TotalSeconds;
             lastUpdate = now;
 
-            FPScounter.Text = (Lerp((1f / dt), dt, 0.01f)).ToString("0") + " FPS";
+            currentFPS = Lerp(currentFPS, (1f / dt), 0.1f);
+            FPScounter.Text = currentFPS.ToString("0") + " FPS";
 
             Loop(dt);
         }
@@ -460,7 +470,7 @@ namespace Platformer
         void UpdateNetwork()
         {
             if (client == null) return;
-            NetEntity netPlayer = new NetEntity(new netVector(player.position.X, player.position.Y), new netVector(player.velocity.X, player.velocity.Y));
+            NetEntity netPlayer = new NetEntity(new NetVector(player.position.X, player.position.Y), new NetVector(player.velocity.X, player.velocity.Y));
             client.fire("update", netPlayer.ToString());
         }
 
@@ -482,19 +492,20 @@ namespace Platformer
                     NetEntity netEntity = new NetEntity();
                     netEntity.UpdateFromString(entry, true);
 
-                    PhysicsEntity ent = physicsEntities.FirstOrDefault(a => a.id == netEntity.clientId);
+                    PlayerEntity ent = playerEntities.FirstOrDefault(a => a.id == netEntity.clientId);
 
                     if (ent == null)
                     {
-                        ent = new PhysicsEntity();
+                        ent = new PlayerEntity();
                         ent.id = netEntity.clientId;
+                        ent.sprite.image = Properties.Resources.Player;
                         addEntity(ent);
                     }
 
-                    ent.position.X = netEntity.position.x;
-                    ent.position.Y = netEntity.position.y;
-                    ent.velocity.X = netEntity.velocity.x;
-                    ent.velocity.Y = netEntity.velocity.y;
+                    ent.position.X = netEntity.position.X;
+                    ent.position.Y = netEntity.position.Y;
+                    ent.velocity.X = netEntity.velocity.X;
+                    ent.velocity.Y = netEntity.velocity.Y;
                 }
             }
 

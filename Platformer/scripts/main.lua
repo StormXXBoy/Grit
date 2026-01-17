@@ -2,6 +2,7 @@ local startEnt
 local newBullet = Entity.physics()
 local elevator = Entity.platform()
 local npc = Entity.player()
+local networkClient = nil
 
 function init()
 	startEnt = Entity.base();
@@ -15,11 +16,43 @@ function init()
 	addEntity(npc)
 end
 
+function createBlock(pos, size)
+	local newBlock = Entity.platform()
+	newBlock.position = pos
+	newBlock.size = size
+	addEntity(newBlock);
+end
+
 function serverConnected(client)
+	networkClient = client
+	removeEntity(newBullet)
 	client.listen("test", function(data)
 		print(data)
 	end)
-	client.fire("test", "cool test")
+	client.listen("shoot", function(data)
+		local parts = string.split(data, "+")
+		local netBullet = Net.entity()
+		netBullet.UpdateFromString(parts[2])
+		local bullet = Entity.physics()
+
+		bullet.position = Vector(netBullet.position.X, netBullet.position.Y)
+		bullet.velocity = Vector(netBullet.velocity.X, netBullet.velocity.Y)
+		bullet.size = Vector(10, 10)
+		print(netBullet.position.X, netBullet.position.Y)
+		print(netBullet.velocity.X, netBullet.velocity.Y)
+
+		addEntity(bullet)
+	end)
+	client.listen("place", function(data)
+		local parts = string.split(data, "+")
+		local netpos = Net.vector()
+		local netsize = Net.vector()
+		netpos.UpdateFromString(parts[1])
+		netsize.UpdateFromString(parts[2])
+		local pos = Vector(netpos.X, netpos.Y)
+		local size = Vector(netsize.X, netsize.Y)
+		createBlock(pos, size)
+	end)
 end
 
 function update(dt)
@@ -36,25 +69,65 @@ function update(dt)
 	end
 end
 
+local bufferPoint = nil
 function onInput(inputInfo)
 	--print(inputInfo.type, inputInfo.state, inputInfo.button, inputInfo.position)
-	if (inputInfo.type == Enum.InputType.Mouse and inputInfo.state == Enum.InputState.Down and inputInfo.button == Enum.MouseButton.Left) then
-		if input.isKeyDown(Enum.Key.E) then
-			player.center = inputInfo.position
-			player.velocity = Vector(0, 0)
-			return
+	if (inputInfo.type == Enum.InputType.Mouse and inputInfo.state == Enum.InputState.Down) then
+		if inputInfo.button == Enum.MouseButton.Left then
+			if input.isKeyDown(Enum.Key.E) then
+				player.center = inputInfo.position
+				player.velocity = Vector(0, 0)
+				return
+			end
+
+			--player.size = player.size * 1.1;
+
+			local shootDirection = inputInfo.position - player.position;
+
+			newBullet.position = player.center - Vector(5, 10);
+			newBullet.acceleration = player.acceleration;
+			newBullet.velocity = player.velocity + (shootDirection.normalize() * 50);
+
+			if networkClient ~= nil then
+				local netBullet = Net.entity()
+				netBullet.position = Net.vector()
+				netBullet.velocity = Net.vector()
+				netBullet.position.X = newBullet.position.X
+				netBullet.position.Y = newBullet.position.Y
+				netBullet.velocity.X = newBullet.velocity.X
+				netBullet.velocity.Y = newBullet.velocity.Y
+				networkClient.fire("shoot", netBullet.ToString())
+			end
+
+			--player.velocity += (shootDirection.normalize() * 50);
+
+			newBullet.size = Vector(10, 10);
+		elseif inputInfo.button == Enum.MouseButton.Right then
+            if not bufferPoint then
+                bufferPoint = inputInfo.position;
+            else
+                local start = bufferPoint;
+                local endPoint = inputInfo.position;
+
+                local x = math.min(start.X, endPoint.X);
+                local y = math.min(start.Y, endPoint.Y);
+                local w = math.abs(endPoint.X - start.X);
+                local h = math.abs(endPoint.Y - start.Y);
+
+				if networkClient then
+					local netpos = Net.vector()
+					local netsize = Net.vector()
+					netpos.X = x
+					netpos.Y = y
+					netsize.X = w
+					netsize.Y = h
+					networkClient.fire("place", netpos.ToString() .. "+" .. netsize.ToString())
+				else
+					createBlock(Vector(x, y), Vector(w, h))
+				end
+                bufferPoint = nil;
+			end
 		end
-
-		--player.size = player.size * 1.1;
-
-		local shootDirection = inputInfo.position - player.position;
-
-        newBullet.position = player.center - Vector(5, 10);
-        newBullet.acceleration = player.acceleration;
-        newBullet.velocity = player.velocity + (shootDirection.normalize() * 50);
-        --player.velocity += (shootDirection.normalize() * 50);
-
-		newBullet.size = Vector(10, 10);
 	end
 
 	if (inputInfo.key == Enum.Key.T and inputInfo.state == Enum.InputState.Down) then

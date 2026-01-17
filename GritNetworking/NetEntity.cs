@@ -6,47 +6,55 @@ using System.Threading.Tasks;
 
 namespace GritNetworking
 {
-    public struct netVector
+    public class NetVector
     {
-        public float x;
-        public float y;
+        public float X;
+        public float Y;
 
-        public netVector(float X, float Y)
+        public NetVector() { }
+        public NetVector(float x, float y)
         {
-            x = X;
-            y = Y;
+            X = x;
+            Y = y;
         }
-        public netVector(string str)
+        public NetVector(string str)
         {
             string[] parts = str.Split('/');
-            x = float.Parse(parts[0]);
-            y = float.Parse(parts[1]);
+            X = float.Parse(parts[0]);
+            Y = float.Parse(parts[1]);
+        }
+
+        public void UpdateFromString(string str)
+        {
+            string[] parts = str.Split('/');
+            X = float.Parse(parts[0]);
+            Y = float.Parse(parts[1]);
         }
 
         public override string ToString()
         {
-            return x + "/" + y;
+            return X + "/" + Y;
         }
     }
 
     public class NetEntity
     {
         public string clientId;
-        public netVector position = new netVector();
-        public netVector velocity = new netVector();
+        public NetVector position = new NetVector();
+        public NetVector velocity = new NetVector();
 
         public NetEntity() { }
         public NetEntity(string ID)
         {
             clientId = ID;
         }
-        public NetEntity(string ID, netVector pos, netVector vel) 
+        public NetEntity(string ID, NetVector pos, NetVector vel) 
         {
             clientId = ID;
             position = pos;
             velocity = vel;
         }
-        public NetEntity(netVector pos, netVector vel) 
+        public NetEntity(NetVector pos, NetVector vel) 
         {
             position = pos;
             velocity = vel;
@@ -59,8 +67,8 @@ namespace GritNetworking
             {
                 clientId = parts[0];
             }
-            position = new netVector(parts[1]);
-            velocity = new netVector(parts[2]);
+            position = new NetVector(parts[1]);
+            velocity = new NetVector(parts[2]);
         }
 
         public override string ToString()
