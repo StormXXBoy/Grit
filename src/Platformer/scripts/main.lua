@@ -88,13 +88,9 @@ function onInput(inputInfo)
 
 			if networkClient ~= nil then
 				local netBullet = Net.entity()
-				netBullet.position = Net.vector()
-				netBullet.velocity = Net.vector()
-				netBullet.position.X = newBullet.position.X
-				netBullet.position.Y = newBullet.position.Y
-				netBullet.velocity.X = newBullet.velocity.X
-				netBullet.velocity.Y = newBullet.velocity.Y
-				networkClient.fire("shoot", netBullet.ToString())
+				netBullet.position = Net.vector(newBullet.position.X, newBullet.position.Y)
+				netBullet.velocity = Net.vector(newBullet.velocity.X, newBullet.velocity.Y)
+				networkClient:fire("shoot", netBullet:ToString())
 			end
 
 			--player.velocity += (shootDirection.normalize() * 50);

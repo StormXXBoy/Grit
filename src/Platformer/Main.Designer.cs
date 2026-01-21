@@ -30,11 +30,11 @@
         {
             this.gameScreen = new System.Windows.Forms.PictureBox();
             this.menu = new System.Windows.Forms.Panel();
+            this.ipInput = new System.Windows.Forms.TextBox();
             this.HostButton = new System.Windows.Forms.Button();
             this.FPScounter = new System.Windows.Forms.Label();
             this.TestButton = new System.Windows.Forms.Button();
             this.ConnectButton = new System.Windows.Forms.Button();
-            this.ipInput = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).BeginInit();
             this.menu.SuspendLayout();
             this.SuspendLayout();
@@ -63,6 +63,14 @@
             this.menu.Size = new System.Drawing.Size(400, 400);
             this.menu.TabIndex = 1;
             this.menu.Visible = false;
+            // 
+            // ipInput
+            // 
+            this.ipInput.Location = new System.Drawing.Point(219, 376);
+            this.ipInput.Name = "ipInput";
+            this.ipInput.Size = new System.Drawing.Size(86, 20);
+            this.ipInput.TabIndex = 4;
+            this.ipInput.Text = "127.0.0.1";
             // 
             // HostButton
             // 
@@ -107,15 +115,7 @@
             this.ConnectButton.UseVisualStyleBackColor = true;
             this.ConnectButton.Click += new System.EventHandler(this.Connect_Click);
             // 
-            // ipInput
-            // 
-            this.ipInput.Location = new System.Drawing.Point(219, 376);
-            this.ipInput.Name = "ipInput";
-            this.ipInput.Size = new System.Drawing.Size(86, 20);
-            this.ipInput.TabIndex = 4;
-            this.ipInput.Text = "127.0.0.1";
-            // 
-            // Form1
+            // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -123,7 +123,7 @@
             this.Controls.Add(this.menu);
             this.Controls.Add(this.gameScreen);
             this.KeyPreview = true;
-            this.Name = "Form1";
+            this.Name = "Main";
             this.Text = "Grit";
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).EndInit();
             this.menu.ResumeLayout(false);

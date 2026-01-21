@@ -25,6 +25,8 @@ namespace Platformer
         public Netwerkr.Netwerkr net = new Netwerkr.Netwerkr();
         public NetwerkrClient client;
 
+        Chat chatForm = new Chat();
+
         Size gameBounds = new Size(500, 500);
         Graphics area;
         Bitmap backgroundImage = Properties.Resources.background;
@@ -512,6 +514,9 @@ namespace Platformer
             client.listen("connect", handleData);
 
             client.listen("update", handleData);
+
+            chatForm = new Chat();
+            chatForm.Show();
         }
         private void HostButton_Click(object sender, EventArgs e)
         {
