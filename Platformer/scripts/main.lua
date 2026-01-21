@@ -26,6 +26,8 @@ end
 function serverConnected(client)
 	networkClient = client
 	removeEntity(newBullet)
+	removeEntity(elevator)
+	removeEntity(npc)
 	client.listen("test", function(data)
 		print(data)
 	end)
@@ -44,13 +46,9 @@ function serverConnected(client)
 		addEntity(bullet)
 	end)
 	client.listen("place", function(data)
-		local parts = string.split(data, "+")
-		local netpos = Net.vector()
-		local netsize = Net.vector()
-		netpos.UpdateFromString(parts[1])
-		netsize.UpdateFromString(parts[2])
-		local pos = Vector(netpos.X, netpos.Y)
-		local size = Vector(netsize.X, netsize.Y)
+		local parts = Net.split("+",data)
+		local pos = Vector(parts[1].X, parts[1].Y)
+		local size = Vector(parts[2].X, parts[2].Y)
 		createBlock(pos, size)
 	end)
 end
@@ -115,13 +113,9 @@ function onInput(inputInfo)
                 local h = math.abs(endPoint.Y - start.Y);
 
 				if networkClient then
-					local netpos = Net.vector()
-					local netsize = Net.vector()
-					netpos.X = x
-					netpos.Y = y
-					netsize.X = w
-					netsize.Y = h
-					networkClient.fire("place", netpos.ToString() .. "+" .. netsize.ToString())
+					local netpos = Net.vector(x, y)
+					local netsize = Net.vector(w, h)
+					networkClient.fire("place", Net.join("+", netpos, netsize))
 				else
 					createBlock(Vector(x, y), Vector(w, h))
 				end

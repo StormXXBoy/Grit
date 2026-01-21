@@ -49,8 +49,74 @@ public class LuaEngine
         UserData.RegisterType<NetVector>();
         UserData.RegisterType<NetEntity>();
         var netTable = DynValue.NewTable(script);
-        netTable.Table.Set("vector", createFunction((Func<DynValue>)(() => { return UserData.Create(new NetVector()); })));
+        netTable.Table.Set("vector", DynValue.NewCallback((ctx, args) =>
+        {
+            float x = 0, y = 0;
+
+            if (args.Count > 0 && !args[0].IsNil()) x = Convert.ToSingle(args[0].ToObject());
+            if (args.Count > 1 && !args[1].IsNil()) y = Convert.ToSingle(args[1].ToObject());
+
+            return UserData.Create(new NetVector(x, y));
+        }));
         netTable.Table.Set("entity", createFunction((Func<DynValue>)(() => { return UserData.Create(new NetEntity()); })));
+        netTable.Table.Set("join", DynValue.NewCallback((ctx, args) =>
+        {
+            string separator = args.Count > 0 ? args[0].CastToString() : "";
+            List<string> parts = new List<string>();
+
+            for (int i = 1; i < args.Count; i++)
+            {
+                var arg = args[i];
+
+                if (arg.Type == DataType.UserData)
+                {
+                    var obj = arg.UserData.Object;
+
+                    if (obj is NetVector v)
+                        parts.Add("V|" + v.ToString());
+                    else if (obj is NetEntity e)
+                        parts.Add("E|" + e.ToString());
+                    else
+                        parts.Add(arg.ToString());
+                }
+                else
+                {
+                    parts.Add(arg.ToString());
+                }
+            }
+
+            return DynValue.NewString(string.Join(separator, parts));
+        }));
+        netTable.Table.Set("split", DynValue.NewCallback((ctx, args) =>
+        {
+            string separator = args.Count > 0 ? args[0].CastToString() : "";
+            string str = args.Count > 1 ? args[1].CastToString() : "";
+
+            var splits = str.Split(new[] { separator }, StringSplitOptions.None);
+            var table = DynValue.NewTable(script);
+
+            int index = 1;
+            foreach (var s in splits)
+            {
+                if (s.StartsWith("V|"))
+                {
+                    table.Table.Set(index++,
+                        UserData.Create(new NetVector(s.Substring(2))));
+                }
+                else if (s.StartsWith("E|"))
+                {
+                    var entity = new NetEntity();
+                    entity.UpdateFromString(s.Substring(2), true);
+                    table.Table.Set(index++, UserData.Create(entity));
+                }
+                else
+                {
+                    table.Table.Set(index++, DynValue.NewString(s));
+                }
+            }
+
+            return table;
+        }));
         script.Globals["Net"] = netTable;
 
         var stringTable = script.Globals.Get("string").Table;
