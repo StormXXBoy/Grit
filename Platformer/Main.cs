@@ -20,7 +20,7 @@ using System.Windows.Forms;
 
 namespace Platformer
 {
-    public partial class Form1 : Form
+    public partial class Main : Form
     {
         public Netwerkr.Netwerkr net = new Netwerkr.Netwerkr();
         public NetwerkrClient client;
@@ -45,7 +45,7 @@ namespace Platformer
 
         SoundMachine soundMachine = new SoundMachine();
 
-        public Form1()
+        public Main()
         {
             InitializeComponent();
 
