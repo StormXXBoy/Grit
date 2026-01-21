@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platformer", "Platformer\Platformer.csproj", "{25584295-261A-437B-8CFF-F6558B9D2E0C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{FDECE7BD-FA84-4793-BD19-2548CFDF4C86}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netwerkr", "Netwerkr\Netwerkr.csproj", "{A09ED7CD-DC82-4765-857F-0EA3FD237124}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GritNetworking", "GritNetworking\GritNetworking.csproj", "{BDFCF51B-89D1-4499-8D8E-71F6D31527EE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platformer", "src\Platformer\Platformer.csproj", "{25584295-261A-437B-8CFF-F6558B9D2E0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "src\Server\Server.csproj", "{FDECE7BD-FA84-4793-BD19-2548CFDF4C86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netwerkr", "src\Netwerkr\Netwerkr.csproj", "{A09ED7CD-DC82-4765-857F-0EA3FD237124}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GritNetworking", "src\GritNetworking\GritNetworking.csproj", "{BDFCF51B-89D1-4499-8D8E-71F6D31527EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
