@@ -34,17 +34,20 @@
             // 
             // chatInput
             // 
-            this.chatInput.Location = new System.Drawing.Point(13, 279);
+            this.chatInput.AcceptsReturn = true;
+            this.chatInput.Location = new System.Drawing.Point(12, 279);
             this.chatInput.Name = "chatInput";
             this.chatInput.Size = new System.Drawing.Size(459, 20);
             this.chatInput.TabIndex = 0;
-            this.chatInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.chatInput_KeyDown);
+            this.chatInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.chatInput_KeyPress);
             // 
             // chatMessages
             // 
             this.chatMessages.FormattingEnabled = true;
             this.chatMessages.Location = new System.Drawing.Point(12, 12);
             this.chatMessages.Name = "chatMessages";
+            this.chatMessages.ScrollAlwaysVisible = true;
+            this.chatMessages.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.chatMessages.Size = new System.Drawing.Size(460, 264);
             this.chatMessages.TabIndex = 1;
             // 
@@ -55,9 +58,9 @@
             this.ClientSize = new System.Drawing.Size(484, 311);
             this.Controls.Add(this.chatMessages);
             this.Controls.Add(this.chatInput);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Chat";
             this.Text = "Chat";
+            this.Resize += new System.EventHandler(this.Chat_Resize);
             this.ResumeLayout(false);
             this.PerformLayout();
 

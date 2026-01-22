@@ -20,19 +20,46 @@ namespace Platformer
             InitializeComponent();
         }
 
-        public Chat(string ip, int port)
+        public Chat(NetwerkrClient netwerkrClient)
         {
             InitializeComponent();
-            client = new NetwerkrClient(ip, port);
+            Chat_Resize(null, null);
+            client = netwerkrClient;
+            client.listen("message", (data) =>
+            {
+                addMessage(data);
+            });
         }
 
-        private void chatInput_KeyDown(object sender, KeyEventArgs e)
+        public void addMessage(string message)
         {
-            if (e.KeyCode == Keys.Enter)
+            chatMessages.Items.Add(message);
+        }
+
+        private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
             {
-                chatMessages.Items.Add(chatInput.Text);
+                if (client != null)
+                {
+                    client.fire("message", chatInput.Text);
+                }
+                else
+                {
+                    addMessage(chatInput.Text);
+                }
                 chatInput.Text = "";
+                chatMessages.TopIndex = chatMessages.Items.Count-1;
+                e.Handled = true;
             }
+        }
+
+        private void Chat_Resize(object sender, EventArgs e)
+        {
+            chatMessages.Location = new Point(0, 0);
+            chatMessages.Size = new Size(this.ClientSize.Width, this.ClientSize.Height - chatInput.Height);
+            chatInput.Location = new Point(0, this.ClientSize.Height - chatInput.Height);
+            chatInput.Size = new Size(this.ClientSize.Width, chatInput.Height);
         }
     }
 }

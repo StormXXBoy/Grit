@@ -42,6 +42,8 @@ namespace Server
                 luaEngine?.Call("onNewClient", clientId);
                 server.fireClient(clientId, "connect", clientsDataExept(clientId));
                 clientsData.Add(new NetEntity(clientId));
+                string split = clientId.Split('-')[1];
+                server.fireAllClients("message", $"New player {split} connected.");
             };
 
             server.listen("update", (clientId, data) =>
@@ -53,6 +55,12 @@ namespace Server
                     //luaEngine?.Call("updateRecieved", clientId, data);
                     clientDataItem.UpdateFromString(data);
                 }
+            });
+
+            server.listen("message", (clientId, data) =>
+            {
+                string split = clientId.Split('-')[1];
+                server.fireAllClients("message", $"{split}: {data}");
             });
 
             System.Timers.Timer broadcastTimer = new System.Timers.Timer(10);

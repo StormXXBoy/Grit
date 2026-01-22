@@ -40,8 +40,8 @@ function serverConnected(client)
 		bullet.position = Vector(netBullet.position.X, netBullet.position.Y)
 		bullet.velocity = Vector(netBullet.velocity.X, netBullet.velocity.Y)
 		bullet.size = Vector(10, 10)
-		print(netBullet.position.X, netBullet.position.Y)
-		print(netBullet.velocity.X, netBullet.velocity.Y)
+		--print(netBullet.position.X, netBullet.position.Y)
+		--print(netBullet.velocity.X, netBullet.velocity.Y)
 
 		addEntity(bullet)
 	end)
@@ -125,6 +125,12 @@ function onInput(inputInfo)
 		for i, v in pairs(Entities.collision()) do
 			print(i, v)
 			removeEntity(v)
+		end
+	end
+
+	if (inputInfo.key == Enum.Key.F and inputInfo.state == Enum.InputState.Down) then
+		if networkClient then
+			networkClient:fire("message", "*farts*")
 		end
 	end
 end

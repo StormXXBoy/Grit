@@ -28,15 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.gameScreen = new System.Windows.Forms.PictureBox();
             this.menu = new System.Windows.Forms.Panel();
+            this.menuStrip = new System.Windows.Forms.ToolStrip();
             this.ipInput = new System.Windows.Forms.TextBox();
             this.HostButton = new System.Windows.Forms.Button();
             this.FPScounter = new System.Windows.Forms.Label();
-            this.TestButton = new System.Windows.Forms.Button();
             this.ConnectButton = new System.Windows.Forms.Button();
+            this.toolstripTest = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).BeginInit();
             this.menu.SuspendLayout();
+            this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // gameScreen
@@ -53,16 +56,28 @@
             // 
             // menu
             // 
+            this.menu.BackColor = System.Drawing.SystemColors.Control;
+            this.menu.Controls.Add(this.menuStrip);
             this.menu.Controls.Add(this.ipInput);
             this.menu.Controls.Add(this.HostButton);
             this.menu.Controls.Add(this.FPScounter);
-            this.menu.Controls.Add(this.TestButton);
             this.menu.Controls.Add(this.ConnectButton);
             this.menu.Location = new System.Drawing.Point(50, 50);
             this.menu.Name = "menu";
             this.menu.Size = new System.Drawing.Size(400, 400);
             this.menu.TabIndex = 1;
             this.menu.Visible = false;
+            // 
+            // menuStrip
+            // 
+            this.menuStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolstripTest});
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(400, 25);
+            this.menuStrip.TabIndex = 5;
+            this.menuStrip.Text = "toolStrip1";
             // 
             // ipInput
             // 
@@ -87,21 +102,11 @@
             // FPScounter
             // 
             this.FPScounter.AutoSize = true;
-            this.FPScounter.Location = new System.Drawing.Point(4, 4);
+            this.FPScounter.Location = new System.Drawing.Point(3, 384);
             this.FPScounter.Name = "FPScounter";
             this.FPScounter.Size = new System.Drawing.Size(42, 13);
             this.FPScounter.TabIndex = 2;
             this.FPScounter.Text = "67 FPS";
-            // 
-            // TestButton
-            // 
-            this.TestButton.Location = new System.Drawing.Point(322, 316);
-            this.TestButton.Name = "TestButton";
-            this.TestButton.Size = new System.Drawing.Size(75, 23);
-            this.TestButton.TabIndex = 1;
-            this.TestButton.Text = "Test";
-            this.TestButton.UseVisualStyleBackColor = true;
-            this.TestButton.Click += new System.EventHandler(this.TestButton_Click);
             // 
             // ConnectButton
             // 
@@ -115,19 +120,34 @@
             this.ConnectButton.UseVisualStyleBackColor = true;
             this.ConnectButton.Click += new System.EventHandler(this.Connect_Click);
             // 
+            // toolstripTest
+            // 
+            this.toolstripTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolstripTest.Image = ((System.Drawing.Image)(resources.GetObject("toolstripTest.Image")));
+            this.toolstripTest.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
+            this.toolstripTest.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolstripTest.Name = "toolstripTest";
+            this.toolstripTest.Size = new System.Drawing.Size(31, 22);
+            this.toolstripTest.Text = "Test";
+            this.toolstripTest.Click += new System.EventHandler(this.toolstripTest_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(584, 561);
             this.Controls.Add(this.menu);
             this.Controls.Add(this.gameScreen);
             this.KeyPreview = true;
+            this.MinimumSize = new System.Drawing.Size(550, 550);
             this.Name = "Main";
             this.Text = "Grit";
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).EndInit();
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
+            this.menuStrip.ResumeLayout(false);
+            this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -137,10 +157,11 @@
         private System.Windows.Forms.PictureBox gameScreen;
         private System.Windows.Forms.Panel menu;
         private System.Windows.Forms.Button ConnectButton;
-        private System.Windows.Forms.Button TestButton;
         private System.Windows.Forms.Label FPScounter;
         private System.Windows.Forms.Button HostButton;
         private System.Windows.Forms.TextBox ipInput;
+        private System.Windows.Forms.ToolStrip menuStrip;
+        private System.Windows.Forms.ToolStripButton toolstripTest;
     }
 }
 

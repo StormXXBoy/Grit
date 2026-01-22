@@ -515,8 +515,9 @@ namespace Platformer
 
             client.listen("update", handleData);
 
-            chatForm = new Chat();
+            chatForm = new Chat(client);
             chatForm.Show();
+            chatForm.addMessage("Connected to server.");
         }
         private void HostButton_Click(object sender, EventArgs e)
         {
@@ -525,7 +526,7 @@ namespace Platformer
             Connect_Click(null, null);
         }
 
-        private void TestButton_Click(object sender, EventArgs e)
+        private void toolstripTest_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Test button clicked");
             soundMachine.LoadSound("track03", "sounds/track03.mp3");
