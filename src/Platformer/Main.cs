@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,6 +32,7 @@ namespace Platformer
         Graphics area;
         Bitmap backgroundImage = Properties.Resources.background;
         Bitmap backBuffer;
+        Graphics backG;
 
         LuaEngine luaEngine = new LuaEngine();
 
@@ -176,6 +178,7 @@ namespace Platformer
         {
             area = gameScreen.CreateGraphics();
             backBuffer = new Bitmap(gameBounds.Width, gameBounds.Height);
+            backG = Graphics.FromImage(backBuffer);
 
             input = new InputHandler(this, gameScreen);
             input.subscribeKeyDown(Keys.Escape, () => {
@@ -454,17 +457,14 @@ namespace Platformer
 
         void DrawLoop()
         {
-            using (Graphics g = Graphics.FromImage(backBuffer))
-            {
-                //g.Clear(background);
-                float para = 50;
-                float xD = ((1 - (player.position.X / backBuffer.Width)) * para) - para;
-                float yD = ((1 - (player.position.Y / backBuffer.Height)) * para) - para;
-                g.DrawImage(backgroundImage, xD, yD, backBuffer.Width + para, backBuffer.Height + para);
+            //g.Clear(background);
+            float para = 50;
+            float xD = ((1 - (player.position.X / backBuffer.Width)) * para) - para;
+            float yD = ((1 - (player.position.Y / backBuffer.Height)) * para) - para;
+            backG.DrawImage(backgroundImage, xD, yD, backBuffer.Width + para, backBuffer.Height + para);
 
-                foreach (var entity in entities)
-                    entity.Draw(g);
-            }
+            foreach (var entity in entities)
+                entity.Draw(backG);
 
             area.DrawImageUnscaled(backBuffer, 0, 0);
         }
