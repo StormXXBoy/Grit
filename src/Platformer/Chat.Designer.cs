@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Chat));
             this.chatInput = new System.Windows.Forms.TextBox();
             this.chatMessages = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
@@ -58,6 +59,7 @@
             this.ClientSize = new System.Drawing.Size(484, 311);
             this.Controls.Add(this.chatMessages);
             this.Controls.Add(this.chatInput);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Chat";
             this.Text = "Chat";
             this.Resize += new System.EventHandler(this.Chat_Resize);

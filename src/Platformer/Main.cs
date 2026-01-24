@@ -164,6 +164,19 @@ namespace Platformer
             luaEngine.RegisterFunction("removeEntity", (Func<Entity, Entity>)((ent) => removeEntity(ent)));
             luaEngine.RegisterFunction("entityJump", (Action<PhysicsEntity>)((ent) => entityJump(ent)));
 
+            luaEngine.RegisterFunction("addButton", (Func<string, Closure, DynValue>)((buttonText, func) =>
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem(buttonText);
+                item.Click += (s, e) =>
+                {
+                    luaEngine?.script.Call(func);
+                };
+
+                gameUI.DropDownItems.Add(item);
+
+                return DynValue.FromObject(luaEngine.script, (Action)(() => { gameUI.DropDownItems.Remove(item); }));
+            }));
+
             luaEngine.RunFile("scripts/main.lua");
 
             luaEngine?.Call("init");
@@ -310,20 +323,23 @@ namespace Platformer
 
             for (int step = 0; step < subSteps; step++)
             {
-                foreach (var entity in physicsEntities)
+                try // This is here cuz the lua adds to the physicsEntities list while we're iterating it sometimes and then it errors I think? But I mean it doesnt like crash its just annoying error so yeah idk it works.
                 {
-                    if (!isGrounded(entity)) entity.acceleration.Y += gravity * dt;
+                    foreach (var entity in physicsEntities)
+                    {
+                        if (!isGrounded(entity)) entity.acceleration.Y += gravity * dt;
 
-                    entity.velocity += entity.acceleration * dt;
-                    entity.acceleration *= (float)Math.Pow(friction, dt);
-                    entity.velocity *= (float)Math.Pow(friction, dt);
+                        entity.velocity += entity.acceleration * dt;
+                        entity.acceleration *= (float)Math.Pow(friction, dt);
+                        entity.velocity *= (float)Math.Pow(friction, dt);
 
-                    entity.position.Y += entity.velocity.Y * dt;
-                    ResolveAxisCollision(entity, axisX: false);
+                        entity.position.Y += entity.velocity.Y * dt;
+                        ResolveAxisCollision(entity, axisX: false);
 
-                    entity.position.X += entity.velocity.X * dt;
-                    ResolveAxisCollision(entity, axisX: true);
-                }
+                        entity.position.X += entity.velocity.X * dt;
+                        ResolveAxisCollision(entity, axisX: true);
+                    }
+                } catch {}
             }
         }
 

@@ -29,34 +29,24 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
-            this.gameScreen = new System.Windows.Forms.PictureBox();
             this.menu = new System.Windows.Forms.Panel();
             this.menuStrip = new System.Windows.Forms.ToolStrip();
+            this.toolstripTest = new System.Windows.Forms.ToolStripButton();
             this.ipInput = new System.Windows.Forms.TextBox();
             this.HostButton = new System.Windows.Forms.Button();
             this.FPScounter = new System.Windows.Forms.Label();
             this.ConnectButton = new System.Windows.Forms.Button();
-            this.toolstripTest = new System.Windows.Forms.ToolStripButton();
-            ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).BeginInit();
+            this.gameScreen = new System.Windows.Forms.PictureBox();
+            this.gameUI = new System.Windows.Forms.ToolStripDropDownButton();
             this.menu.SuspendLayout();
             this.menuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).BeginInit();
             this.SuspendLayout();
-            // 
-            // gameScreen
-            // 
-            this.gameScreen.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.gameScreen.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.gameScreen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.gameScreen.Location = new System.Drawing.Point(0, 0);
-            this.gameScreen.Margin = new System.Windows.Forms.Padding(0);
-            this.gameScreen.Name = "gameScreen";
-            this.gameScreen.Size = new System.Drawing.Size(500, 500);
-            this.gameScreen.TabIndex = 0;
-            this.gameScreen.TabStop = false;
             // 
             // menu
             // 
             this.menu.BackColor = System.Drawing.SystemColors.Control;
+            this.menu.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("menu.BackgroundImage")));
             this.menu.Controls.Add(this.menuStrip);
             this.menu.Controls.Add(this.ipInput);
             this.menu.Controls.Add(this.HostButton);
@@ -70,14 +60,30 @@
             // 
             // menuStrip
             // 
+            this.menuStrip.BackColor = System.Drawing.Color.Transparent;
+            this.menuStrip.GripMargin = new System.Windows.Forms.Padding(0);
             this.menuStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.gameUI,
             this.toolstripTest});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Padding = new System.Windows.Forms.Padding(0);
+            this.menuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.menuStrip.Size = new System.Drawing.Size(400, 25);
             this.menuStrip.TabIndex = 5;
-            this.menuStrip.Text = "toolStrip1";
+            this.menuStrip.Text = "menuStrip";
+            // 
+            // toolstripTest
+            // 
+            this.toolstripTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolstripTest.Image = ((System.Drawing.Image)(resources.GetObject("toolstripTest.Image")));
+            this.toolstripTest.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
+            this.toolstripTest.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolstripTest.Name = "toolstripTest";
+            this.toolstripTest.Size = new System.Drawing.Size(31, 22);
+            this.toolstripTest.Text = "Test";
+            this.toolstripTest.Click += new System.EventHandler(this.toolstripTest_Click);
             // 
             // ipInput
             // 
@@ -120,34 +126,47 @@
             this.ConnectButton.UseVisualStyleBackColor = true;
             this.ConnectButton.Click += new System.EventHandler(this.Connect_Click);
             // 
-            // toolstripTest
+            // gameScreen
             // 
-            this.toolstripTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolstripTest.Image = ((System.Drawing.Image)(resources.GetObject("toolstripTest.Image")));
-            this.toolstripTest.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
-            this.toolstripTest.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolstripTest.Name = "toolstripTest";
-            this.toolstripTest.Size = new System.Drawing.Size(31, 22);
-            this.toolstripTest.Text = "Test";
-            this.toolstripTest.Click += new System.EventHandler(this.toolstripTest_Click);
+            this.gameScreen.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.gameScreen.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.gameScreen.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.gameScreen.Location = new System.Drawing.Point(0, 0);
+            this.gameScreen.Margin = new System.Windows.Forms.Padding(0);
+            this.gameScreen.Name = "gameScreen";
+            this.gameScreen.Size = new System.Drawing.Size(500, 500);
+            this.gameScreen.TabIndex = 0;
+            this.gameScreen.TabStop = false;
+            // 
+            // gameUI
+            // 
+            this.gameUI.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.gameUI.Image = ((System.Drawing.Image)(resources.GetObject("gameUI.Image")));
+            this.gameUI.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.gameUI.Name = "gameUI";
+            this.gameUI.Size = new System.Drawing.Size(65, 22);
+            this.gameUI.Text = "Game UI";
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(584, 561);
             this.Controls.Add(this.menu);
             this.Controls.Add(this.gameScreen);
+            this.DoubleBuffered = true;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(550, 550);
             this.Name = "Main";
             this.Text = "Grit";
-            ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).EndInit();
             this.menu.ResumeLayout(false);
             this.menu.PerformLayout();
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -160,8 +179,9 @@
         private System.Windows.Forms.Label FPScounter;
         private System.Windows.Forms.Button HostButton;
         private System.Windows.Forms.TextBox ipInput;
-        private System.Windows.Forms.ToolStrip menuStrip;
         private System.Windows.Forms.ToolStripButton toolstripTest;
+        private System.Windows.Forms.ToolStripDropDownButton gameUI;
+        private System.Windows.Forms.ToolStrip menuStrip;
     }
 }
 

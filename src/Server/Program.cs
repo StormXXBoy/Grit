@@ -27,7 +27,7 @@ namespace Server
             string clientsDataExept(string clientId)
             {
                 string dataToSend = "";
-                foreach (var item in clientsData)
+                foreach (NetEntity item in clientsData)
                 {
                     if (item.clientId == clientId) continue;
                     dataToSend += item.ToString() + "|";
@@ -49,7 +49,7 @@ namespace Server
             server.listen("update", (clientId, data) =>
             {
                 //Console.WriteLine($"Received update from {clientId}: {data}");
-                var clientDataItem = clientsData.Find(c => c.clientId == clientId);
+                NetEntity clientDataItem = clientsData.Find(c => c.clientId == clientId);
                 if (clientDataItem != null)
                 {
                     //luaEngine?.Call("updateRecieved", clientId, data);
@@ -70,7 +70,7 @@ namespace Server
             {
                 //luaEngine?.Call("preUpdateBroadcast");
 
-                foreach (var item in clientsData)
+                foreach (NetEntity item in clientsData)
                 {
                     server.fireClient(item.clientId, "update", clientsDataExept(item.clientId));
                 }

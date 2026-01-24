@@ -14,6 +14,11 @@ function init()
 	elevator.size = Vector(100, 20);
 	addEntity(elevator);
 	addEntity(npc)
+	local remBut
+	remBut = addButton("remove npc", function()
+		removeEntity(npc)
+		remBut()
+	end)
 end
 
 function createBlock(pos, size)
@@ -57,7 +62,7 @@ function update(dt)
 	--print(player.size, player.position)
 	if player.isTouching(startEnt) then
 		startEnt.sprite.color = color(Enum.Color.Red);
-		else
+	else
 		startEnt.sprite.color = color(Enum.Color.Lime);
 	end
 	elevator.center = Vector(250, 250 - math.sin(os.clock() * 0.5) * 200)
