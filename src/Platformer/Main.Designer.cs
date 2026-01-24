@@ -31,13 +31,13 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.menu = new System.Windows.Forms.Panel();
             this.menuStrip = new System.Windows.Forms.ToolStrip();
+            this.gameUI = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolstripTest = new System.Windows.Forms.ToolStripButton();
             this.ipInput = new System.Windows.Forms.TextBox();
             this.HostButton = new System.Windows.Forms.Button();
             this.FPScounter = new System.Windows.Forms.Label();
             this.ConnectButton = new System.Windows.Forms.Button();
             this.gameScreen = new System.Windows.Forms.PictureBox();
-            this.gameUI = new System.Windows.Forms.ToolStripDropDownButton();
             this.menu.SuspendLayout();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gameScreen)).BeginInit();
@@ -74,14 +74,22 @@
             this.menuStrip.TabIndex = 5;
             this.menuStrip.Text = "menuStrip";
             // 
+            // gameUI
+            // 
+            this.gameUI.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.gameUI.Image = ((System.Drawing.Image)(resources.GetObject("gameUI.Image")));
+            this.gameUI.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.gameUI.Name = "gameUI";
+            this.gameUI.Size = new System.Drawing.Size(51, 22);
+            this.gameUI.Text = "Game";
+            // 
             // toolstripTest
             // 
-            this.toolstripTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolstripTest.Image = ((System.Drawing.Image)(resources.GetObject("toolstripTest.Image")));
+            this.toolstripTest.Image = global::Platformer.Properties.Resources.icon;
             this.toolstripTest.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
             this.toolstripTest.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolstripTest.Name = "toolstripTest";
-            this.toolstripTest.Size = new System.Drawing.Size(31, 22);
+            this.toolstripTest.Size = new System.Drawing.Size(47, 22);
             this.toolstripTest.Text = "Test";
             this.toolstripTest.Click += new System.EventHandler(this.toolstripTest_Click);
             // 
@@ -137,15 +145,6 @@
             this.gameScreen.Size = new System.Drawing.Size(500, 500);
             this.gameScreen.TabIndex = 0;
             this.gameScreen.TabStop = false;
-            // 
-            // gameUI
-            // 
-            this.gameUI.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.gameUI.Image = ((System.Drawing.Image)(resources.GetObject("gameUI.Image")));
-            this.gameUI.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.gameUI.Name = "gameUI";
-            this.gameUI.Size = new System.Drawing.Size(65, 22);
-            this.gameUI.Text = "Game UI";
             // 
             // Main
             // 

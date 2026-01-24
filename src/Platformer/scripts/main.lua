@@ -3,6 +3,7 @@ local newBullet = Entity.physics()
 local elevator = Entity.platform()
 local npc = Entity.player()
 local networkClient = nil
+local bullets = {}
 
 function init()
 	startEnt = Entity.base();
@@ -48,6 +49,8 @@ function serverConnected(client)
 		--print(netBullet.position.X, netBullet.position.Y)
 		--print(netBullet.velocity.X, netBullet.velocity.Y)
 
+		bullets[bullet] = os.clock()
+
 		addEntity(bullet)
 	end)
 	client.listen("place", function(data)
@@ -69,6 +72,12 @@ function update(dt)
 	if math.abs(npc.center.x - player.center.x) > 20 then
 		npc.MoveHorizontal(dt, player.center.x - npc.center.x)
 		entityJump(npc)
+	end
+	for bullet, spawnTime in pairs(bullets) do
+		if os.clock() - spawnTime > 5 then
+			removeEntity(bullet)
+			bullets[bullet] = nil
+		end
 	end
 end
 

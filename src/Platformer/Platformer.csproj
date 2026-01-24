@@ -150,6 +150,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\icon.ico" />
+    <None Include="Resources\icon.png" />
     <Content Include="Resources\uiBackground.png" />
     <Content Include="sounds\track03.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

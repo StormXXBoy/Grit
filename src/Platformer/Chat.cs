@@ -33,7 +33,7 @@ namespace Platformer
 
         public void addMessage(string message)
         {
-            chatMessages.Items.Add(message);
+            chatMessages.Items.Insert(0, message);
         }
 
         private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
@@ -49,7 +49,7 @@ namespace Platformer
                     addMessage(chatInput.Text);
                 }
                 chatInput.Text = "";
-                chatMessages.TopIndex = chatMessages.Items.Count-1;
+                chatMessages.TopIndex = 0;
                 e.Handled = true;
             }
         }

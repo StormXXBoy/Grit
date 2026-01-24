@@ -44,6 +44,7 @@
             // 
             // chatMessages
             // 
+            this.chatMessages.BackColor = System.Drawing.SystemColors.Window;
             this.chatMessages.FormattingEnabled = true;
             this.chatMessages.Location = new System.Drawing.Point(12, 12);
             this.chatMessages.Name = "chatMessages";
