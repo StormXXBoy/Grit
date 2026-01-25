@@ -49,8 +49,6 @@ function serverConnected(client)
 		bullet.position = Vector(netBullet.position.X, netBullet.position.Y)
 		bullet.velocity = Vector(netBullet.velocity.X, netBullet.velocity.Y)
 		bullet.size = Vector(10, 10)
-		--print(netBullet.position.X, netBullet.position.Y)
-		--print(netBullet.velocity.X, netBullet.velocity.Y)
 
 		bullets[bullet] = os.clock()
 
