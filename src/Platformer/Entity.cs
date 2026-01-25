@@ -46,8 +46,6 @@ namespace Platformer
     {
         public string id = Guid.NewGuid().ToString();
 
-        public Color color = Color.HotPink;
-
         public Vector size = new Vector(10, 20);
         public Vector position = new Vector(0, 0);
 
@@ -66,7 +64,7 @@ namespace Platformer
         {
             Vector oldCenter = center;
             size = Size;
-            position = new Vector(oldCenter.X - size.X / 2, oldCenter.Y - size.Y / 2);
+            center = oldCenter;
         }
 
         public DateTime lastJumpTime = DateTime.MinValue;

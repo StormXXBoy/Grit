@@ -20,6 +20,9 @@ function init()
 		removeEntity(npc)
 		remBut()
 	end)
+	addButton("zoomies", function()
+		player.speed = player.speed * 2
+	end)
 end
 
 function createBlock(pos, size)
