@@ -61,5 +61,38 @@ namespace Platformer
             chatInput.Location = new Point(0, this.ClientSize.Height - chatInput.Height);
             chatInput.Size = new Size(this.ClientSize.Width, chatInput.Height);
         }
+
+        private void chatMessages_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                int index = chatMessages.IndexFromPoint(e.Location);
+
+                if (index != ListBox.NoMatches)
+                {
+                    chatMessages.SelectionMode = SelectionMode.One;
+                    chatMessages.SelectedIndex = index;
+                    contextStrip.Show(chatMessages, e.Location);
+                }
+                else
+                {
+                    chatMessages.SelectionMode = SelectionMode.None;
+                    chatMessages.ClearSelected();
+                }
+            }
+            else
+            {
+                chatMessages.SelectionMode = SelectionMode.None;
+                chatMessages.ClearSelected();
+            }
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (chatMessages.SelectedItem != null)
+            {
+                Clipboard.SetText(chatMessages.SelectedItem.ToString());
+            }
+        }
     }
 }

@@ -28,9 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Chat));
             this.chatInput = new System.Windows.Forms.TextBox();
             this.chatMessages = new System.Windows.Forms.ListBox();
+            this.contextStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // chatInput
@@ -52,20 +56,37 @@
             this.chatMessages.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.chatMessages.Size = new System.Drawing.Size(460, 264);
             this.chatMessages.TabIndex = 1;
+            this.chatMessages.MouseDown += new System.Windows.Forms.MouseEventHandler(this.chatMessages_MouseDown);
+            // 
+            // contextStrip
+            // 
+            this.contextStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem});
+            this.contextStrip.Name = "contextStrip";
+            this.contextStrip.Size = new System.Drawing.Size(103, 26);
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+            this.copyToolStripMenuItem.Text = "Copy";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
             // 
             // Chat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackgroundImage = global::Platformer.Properties.Resources.uiBackground;
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(484, 311);
             this.Controls.Add(this.chatMessages);
             this.Controls.Add(this.chatInput);
+            this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(250, 300);
             this.Name = "Chat";
             this.Text = "Chat";
             this.Resize += new System.EventHandler(this.Chat_Resize);
+            this.contextStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -75,5 +96,7 @@
 
         private System.Windows.Forms.TextBox chatInput;
         private System.Windows.Forms.ListBox chatMessages;
+        private System.Windows.Forms.ContextMenuStrip contextStrip;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
     }
 }
