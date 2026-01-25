@@ -128,7 +128,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="scripts\main.lua">
+    <None Include="packs\local\scripts\main.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -152,17 +152,20 @@
   <ItemGroup>
     <None Include="Resources\icon.ico" />
     <None Include="Resources\icon.png" />
+    <Content Include="packs\local\images\sprite.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\uiBackground.png" />
-    <Content Include="sounds\track03.mp3">
+    <Content Include="packs\local\sounds\track03.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="sounds\track05.mp3">
+    <Content Include="packs\local\sounds\track05.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="sounds\boing.mp3">
+    <Content Include="packs\local\sounds\boing.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="sounds\jump.mp3">
+    <Content Include="packs\local\sounds\jump.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

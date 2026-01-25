@@ -57,10 +57,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackgroundImage = global::Platformer.Properties.Resources.uiBackground;
             this.ClientSize = new System.Drawing.Size(484, 311);
             this.Controls.Add(this.chatMessages);
             this.Controls.Add(this.chatInput);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(250, 300);
             this.Name = "Chat";
             this.Text = "Chat";
             this.Resize += new System.EventHandler(this.Chat_Resize);

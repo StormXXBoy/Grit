@@ -28,13 +28,15 @@ namespace Platformer
 
         Chat chatForm = new Chat();
 
+        string currentPack = "local";
+
         Size gameBounds = new Size(500, 500);
         Graphics area;
         Bitmap backgroundImage = Properties.Resources.background;
         Bitmap backBuffer;
         Graphics backG;
 
-        LuaEngine luaEngine = new LuaEngine();
+        LuaEngine luaEngine;
 
         Color background = Color.White;
 
@@ -147,8 +149,22 @@ namespace Platformer
             return entity;
         }
 
+        void resetGame()
+        {
+            foreach (var entity in entities.ToArray())
+            {
+                removeEntity(entity);
+            }
+            player.position = new Vector(0, 0);
+            addEntity(player);
+            gameUI.DropDownItems.Clear();
+            initLua();
+        }
+
         void initLua()
         {
+            luaEngine = new LuaEngine();
+
             //luaEngine.RegisterObject("entities", entities);
             luaEngine.RegisterObject("player", player);
             luaEngine.RegisterObject("input", input);
@@ -177,7 +193,7 @@ namespace Platformer
                 return DynValue.FromObject(luaEngine.script, (Action)(() => { gameUI.DropDownItems.Remove(item); }));
             }));
 
-            luaEngine.RunFile("scripts/main.lua");
+            luaEngine.RunFile("packs/"+currentPack+"/scripts/main.lua");
 
             luaEngine?.Call("init");
 
@@ -204,7 +220,7 @@ namespace Platformer
             player.sprite.image = Properties.Resources.Player;
             addEntity(player);
 
-            soundMachine.LoadSound("jump", "sounds/jump.mp3");
+            soundMachine.LoadSound("jump", "packs/local/sounds/jump.mp3");
 
             addEntity(new PlatformEntity(100, gameBounds.Height - 30, 200, 20));
             addEntity(new PlatformEntity(350, 200, 200, 20));
@@ -323,23 +339,20 @@ namespace Platformer
 
             for (int step = 0; step < subSteps; step++)
             {
-                try // This is here cuz the lua adds to the physicsEntities list while we're iterating it sometimes and then it errors I think? But I mean it doesnt like crash its just annoying error so yeah idk it works.
+                foreach (var entity in physicsEntities.ToArray()) // ToArray to avoid modification during iteration gpt taught me ts :pray: thanks
                 {
-                    foreach (var entity in physicsEntities)
-                    {
-                        if (!isGrounded(entity)) entity.acceleration.Y += gravity * dt;
+                    if (!isGrounded(entity)) entity.acceleration.Y += gravity * dt;
 
-                        entity.velocity += entity.acceleration * dt;
-                        entity.acceleration *= (float)Math.Pow(friction, dt);
-                        entity.velocity *= (float)Math.Pow(friction, dt);
+                    entity.velocity += entity.acceleration * dt;
+                    entity.acceleration *= (float)Math.Pow(friction, dt);
+                    entity.velocity *= (float)Math.Pow(friction, dt);
 
-                        entity.position.Y += entity.velocity.Y * dt;
-                        ResolveAxisCollision(entity, axisX: false);
+                    entity.position.Y += entity.velocity.Y * dt;
+                    ResolveAxisCollision(entity, axisX: false);
 
-                        entity.position.X += entity.velocity.X * dt;
-                        ResolveAxisCollision(entity, axisX: true);
-                    }
-                } catch {}
+                    entity.position.X += entity.velocity.X * dt;
+                    ResolveAxisCollision(entity, axisX: true);
+                }
             }
         }
 
@@ -495,6 +508,8 @@ namespace Platformer
         private void Connect_Click(object sender, EventArgs e)
         {
             client = net.startClient(ipInput.Text);
+            currentPack = "local";
+            resetGame();
             luaEngine?.Call("serverConnected", new LuaClient(client));
 
             void handleData(string data)
@@ -528,7 +543,6 @@ namespace Platformer
             }
 
             client.listen("connect", handleData);
-
             client.listen("update", handleData);
 
             chatForm = new Chat(client);
@@ -545,7 +559,7 @@ namespace Platformer
         private void toolstripTest_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Test button clicked");
-            soundMachine.LoadSound("track03", "sounds/track03.mp3");
+            soundMachine.LoadSound("track03", "packs/local/sounds/track03.mp3");
             soundMachine.Play("track03");
         }
     }
