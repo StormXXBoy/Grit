@@ -158,10 +158,10 @@ namespace Platformer
             player.position = new Vector(0, 0);
             addEntity(player);
             gameUI.DropDownItems.Clear();
-            initLua();
+            resetLua();
         }
 
-        void initLua()
+        void resetLua()
         {
             luaEngine = new LuaEngine();
 
@@ -193,9 +193,14 @@ namespace Platformer
                 return DynValue.FromObject(luaEngine.script, (Action)(() => { gameUI.DropDownItems.Remove(item); }));
             }));
 
-            luaEngine.RunFile("packs/"+currentPack+"/scripts/main.lua");
+            luaEngine.RunFile("packs/" + currentPack + "/scripts/main.lua");
 
             luaEngine?.Call("init");
+        }
+
+        void initLua()
+        {
+            resetLua();
 
             input.subscribeInputEvent((info) =>
             {
