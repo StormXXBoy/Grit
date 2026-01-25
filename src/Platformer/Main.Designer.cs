@@ -31,6 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.menu = new System.Windows.Forms.Panel();
             this.menuStrip = new System.Windows.Forms.ToolStrip();
+            this.gritButtons = new System.Windows.Forms.ToolStripDropDownButton();
+            this.openChatButton = new System.Windows.Forms.ToolStripMenuItem();
             this.gameUI = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolstripTest = new System.Windows.Forms.ToolStripButton();
             this.ipInput = new System.Windows.Forms.TextBox();
@@ -64,6 +66,7 @@
             this.menuStrip.GripMargin = new System.Windows.Forms.Padding(0);
             this.menuStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.gritButtons,
             this.gameUI,
             this.toolstripTest});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
@@ -73,6 +76,23 @@
             this.menuStrip.Size = new System.Drawing.Size(400, 25);
             this.menuStrip.TabIndex = 5;
             this.menuStrip.Text = "menuStrip";
+            // 
+            // gritButtons
+            // 
+            this.gritButtons.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openChatButton});
+            this.gritButtons.Image = global::Platformer.Properties.Resources.icon;
+            this.gritButtons.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.gritButtons.Name = "gritButtons";
+            this.gritButtons.Size = new System.Drawing.Size(55, 22);
+            this.gritButtons.Text = "Grit";
+            // 
+            // openChatButton
+            // 
+            this.openChatButton.Name = "openChatButton";
+            this.openChatButton.Size = new System.Drawing.Size(180, 22);
+            this.openChatButton.Text = "Open Chat";
+            this.openChatButton.Click += new System.EventHandler(this.openChatButton_Click);
             // 
             // gameUI
             // 
@@ -85,11 +105,12 @@
             // 
             // toolstripTest
             // 
+            this.toolstripTest.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolstripTest.Image = global::Platformer.Properties.Resources.icon;
             this.toolstripTest.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
             this.toolstripTest.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolstripTest.Name = "toolstripTest";
-            this.toolstripTest.Size = new System.Drawing.Size(47, 22);
+            this.toolstripTest.Size = new System.Drawing.Size(31, 22);
             this.toolstripTest.Text = "Test";
             this.toolstripTest.Click += new System.EventHandler(this.toolstripTest_Click);
             // 
@@ -181,6 +202,8 @@
         private System.Windows.Forms.ToolStripButton toolstripTest;
         private System.Windows.Forms.ToolStripDropDownButton gameUI;
         private System.Windows.Forms.ToolStrip menuStrip;
+        private System.Windows.Forms.ToolStripDropDownButton gritButtons;
+        private System.Windows.Forms.ToolStripMenuItem openChatButton;
     }
 }
 

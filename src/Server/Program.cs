@@ -22,8 +22,6 @@ namespace Server
             luaEngine.script.Globals["clientData"] = luaEngine.createFunction((Func<List<NetEntity>>)(() => clientsData));
             luaEngine.RunFile("scripts/server.lua");
 
-            luaEngine?.Call("init");
-
             string clientsDataExept(string clientId)
             {
                 string dataToSend = "";
@@ -52,7 +50,6 @@ namespace Server
                 NetEntity clientDataItem = clientsData.Find(c => c.clientId == clientId);
                 if (clientDataItem != null)
                 {
-                    //luaEngine?.Call("updateRecieved", clientId, data);
                     clientDataItem.UpdateFromString(data);
                 }
             });
@@ -62,6 +59,8 @@ namespace Server
                 string split = clientId.Split('-')[1];
                 server.fireAllClients("message", $"{split}: {data}");
             });
+
+            luaEngine?.Call("init");
 
             System.Timers.Timer broadcastTimer = new System.Timers.Timer(10);
             broadcastTimer.Start();

@@ -18,6 +18,7 @@ namespace Platformer
         public Chat()
         {
             InitializeComponent();
+            Chat_Resize(null, null);
         }
 
         public Chat(NetwerkrClient netwerkrClient)

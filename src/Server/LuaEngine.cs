@@ -121,6 +121,21 @@ namespace Server
                 return table;
             }));
             script.Globals["Net"] = netTable;
+
+            var stringTable = script.Globals.Get("string").Table;
+            stringTable.Set("split", DynValue.NewCallback((ctx, args) =>
+            {
+                string input = args[0].CastToString();
+                string sep = args.Count > 1 ? args[1].CastToString() : " ";
+
+                var table = new Table(script);
+
+                var parts = input.Split(new string[] { sep }, StringSplitOptions.None);
+                for (int i = 0; i < parts.Length; i++)
+                    table.Set(i + 1, DynValue.NewString(parts[i])); // Lua is 1-based
+
+                return DynValue.NewTable(table);
+            }));
         }
 
         public void RegisterObject(string name, object obj)

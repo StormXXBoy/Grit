@@ -510,6 +510,21 @@ namespace Platformer
             client.fire("update", netPlayer.ToString());
         }
 
+        void OpenChat()
+        {
+            chatForm?.Close();
+            chatForm?.Dispose();
+            if (client != null)
+            {
+                chatForm = new Chat(client);
+            }
+            else
+            {
+                chatForm = new Chat();
+            }
+            chatForm.Show();
+        }
+
         private void Connect_Click(object sender, EventArgs e)
         {
             client = net.startClient(ipInput.Text);
@@ -550,9 +565,8 @@ namespace Platformer
             client.listen("connect", handleData);
             client.listen("update", handleData);
 
-            chatForm = new Chat(client);
-            chatForm.Show();
-            chatForm.addMessage("Connected to server.");
+            OpenChat();
+            chatForm?.addMessage("Connected to server.");
         }
         private void HostButton_Click(object sender, EventArgs e)
         {
@@ -566,6 +580,11 @@ namespace Platformer
             Console.WriteLine("Test button clicked");
             soundMachine.LoadSound("track03", "packs/local/sounds/track03.mp3");
             soundMachine.Play("track03");
+        }
+
+        private void openChatButton_Click(object sender, EventArgs e)
+        {
+            OpenChat();
         }
     }
 }
