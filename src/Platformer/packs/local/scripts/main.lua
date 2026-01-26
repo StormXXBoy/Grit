@@ -150,6 +150,10 @@ function onInput(inputInfo)
 	end
 end
 
+function onNewMessage(message)
+	print(message)
+end
+
 function loopT(table)
 	for i, v in pairs(table) do
 		if type(v) == "table" then

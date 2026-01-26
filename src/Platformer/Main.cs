@@ -523,6 +523,10 @@ namespace Platformer
                 chatForm = new Chat();
             }
             chatForm.Show();
+            chatForm.messageSent = (message) =>
+            {
+                luaEngine?.Call("onNewMessage", message);
+            };
         }
 
         private void Connect_Click(object sender, EventArgs e)

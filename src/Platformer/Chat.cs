@@ -13,7 +13,8 @@ namespace Platformer
 {
     public partial class Chat : Form
     {
-        NetwerkrClient client;
+        private NetwerkrClient client;
+        public Action<string> messageSent;
 
         public Chat()
         {
@@ -35,6 +36,7 @@ namespace Platformer
         public void addMessage(string message)
         {
             chatMessages.Items.Insert(0, message);
+            messageSent?.Invoke(message);
         }
 
         private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
