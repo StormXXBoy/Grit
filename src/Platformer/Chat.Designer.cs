@@ -31,9 +31,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Chat));
             this.chatInput = new System.Windows.Forms.TextBox();
-            this.chatMessages = new System.Windows.Forms.ListBox();
             this.contextStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.chatMessages = new System.Windows.Forms.ListView();
             this.contextStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,18 +45,6 @@
             this.chatInput.Size = new System.Drawing.Size(459, 20);
             this.chatInput.TabIndex = 0;
             this.chatInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.chatInput_KeyPress);
-            // 
-            // chatMessages
-            // 
-            this.chatMessages.BackColor = System.Drawing.SystemColors.Window;
-            this.chatMessages.FormattingEnabled = true;
-            this.chatMessages.Location = new System.Drawing.Point(12, 12);
-            this.chatMessages.Name = "chatMessages";
-            this.chatMessages.ScrollAlwaysVisible = true;
-            this.chatMessages.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.chatMessages.Size = new System.Drawing.Size(460, 264);
-            this.chatMessages.TabIndex = 1;
-            this.chatMessages.MouseDown += new System.Windows.Forms.MouseEventHandler(this.chatMessages_MouseDown);
             // 
             // contextStrip
             // 
@@ -71,6 +59,25 @@
             this.copyToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            // 
+            // chatMessages
+            // 
+            this.chatMessages.BackgroundImage = global::Platformer.Properties.Resources.uiBackground;
+            this.chatMessages.BackgroundImageTiled = true;
+            this.chatMessages.FullRowSelect = true;
+            this.chatMessages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.chatMessages.HideSelection = false;
+            this.chatMessages.LabelWrap = false;
+            this.chatMessages.Location = new System.Drawing.Point(12, 12);
+            this.chatMessages.Margin = new System.Windows.Forms.Padding(0);
+            this.chatMessages.MultiSelect = false;
+            this.chatMessages.Name = "chatMessages";
+            this.chatMessages.ShowItemToolTips = true;
+            this.chatMessages.Size = new System.Drawing.Size(459, 261);
+            this.chatMessages.TabIndex = 0;
+            this.chatMessages.UseCompatibleStateImageBehavior = false;
+            this.chatMessages.View = System.Windows.Forms.View.Details;
+            this.chatMessages.MouseDown += new System.Windows.Forms.MouseEventHandler(this.chatMessages_MouseDown);
             // 
             // Chat
             // 
@@ -95,8 +102,8 @@
         #endregion
 
         private System.Windows.Forms.TextBox chatInput;
-        private System.Windows.Forms.ListBox chatMessages;
         private System.Windows.Forms.ContextMenuStrip contextStrip;
         private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ListView chatMessages;
     }
 }

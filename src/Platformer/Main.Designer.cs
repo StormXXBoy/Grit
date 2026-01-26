@@ -90,7 +90,7 @@
             // openChatButton
             // 
             this.openChatButton.Name = "openChatButton";
-            this.openChatButton.Size = new System.Drawing.Size(180, 22);
+            this.openChatButton.Size = new System.Drawing.Size(131, 22);
             this.openChatButton.Text = "Open Chat";
             this.openChatButton.Click += new System.EventHandler(this.openChatButton_Click);
             // 
@@ -137,11 +137,12 @@
             // FPScounter
             // 
             this.FPScounter.AutoSize = true;
+            this.FPScounter.BackColor = System.Drawing.Color.Transparent;
             this.FPScounter.Location = new System.Drawing.Point(3, 384);
             this.FPScounter.Name = "FPScounter";
             this.FPScounter.Size = new System.Drawing.Size(42, 13);
             this.FPScounter.TabIndex = 2;
-            this.FPScounter.Text = "67 FPS";
+            this.FPScounter.Text = "69 FPS";
             // 
             // ConnectButton
             // 

@@ -151,8 +151,8 @@ function onInput(inputInfo)
 end
 
 function onNewMessage(message)
-	if message == "!help" then
-		addMessage("No help :(")
+	if message == "!info" then
+		addMessage("Grit Project is a 2d platformer sandbox engine/game with multiplayer support writen in C# with WinForms where you can script with lua!")
 	end
 end
 

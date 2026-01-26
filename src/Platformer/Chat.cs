@@ -16,16 +16,24 @@ namespace Platformer
         private NetwerkrClient client;
         public Action<string> messageSent;
 
+        private void initChat()
+        {
+            chatMessages.Columns.Clear();
+            chatMessages.Columns.Add("", chatMessages.ClientSize.Width);
+
+            Chat_Resize(null, null);
+        }
+
         public Chat()
         {
             InitializeComponent();
-            Chat_Resize(null, null);
+            initChat();
         }
 
         public Chat(NetwerkrClient netwerkrClient)
         {
             InitializeComponent();
-            Chat_Resize(null, null);
+            initChat();
             client = netwerkrClient;
             client.listen("message", (data) =>
             {
@@ -35,8 +43,12 @@ namespace Platformer
 
         public void addMessage(string message)
         {
-            chatMessages.Items.Insert(0, message);
+            var item = new ListViewItem(message);
+            item.ToolTipText = message;
+            chatMessages.Items.Insert(0, item);
             messageSent?.Invoke(message);
+
+            Chat_Resize(null, null);
         }
 
         private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
@@ -52,7 +64,6 @@ namespace Platformer
                     addMessage(chatInput.Text);
                 }
                 chatInput.Text = "";
-                chatMessages.TopIndex = 0;
                 e.Handled = true;
             }
         }
@@ -63,38 +74,40 @@ namespace Platformer
             chatMessages.Size = new Size(this.ClientSize.Width, this.ClientSize.Height - chatInput.Height);
             chatInput.Location = new Point(0, this.ClientSize.Height - chatInput.Height);
             chatInput.Size = new Size(this.ClientSize.Width, chatInput.Height);
+
+            if (chatMessages.Columns.Count > 0)
+            {
+                chatMessages.Columns[0].Width = chatMessages.ClientSize.Width;
+            }
         }
 
         private void chatMessages_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
-                int index = chatMessages.IndexFromPoint(e.Location);
-
-                if (index != ListBox.NoMatches)
+                var item = chatMessages.GetItemAt(e.X, e.Y);
+                if (item != null)
                 {
-                    chatMessages.SelectionMode = SelectionMode.One;
-                    chatMessages.SelectedIndex = index;
+                    item.Selected = true;
                     contextStrip.Show(chatMessages, e.Location);
                 }
                 else
                 {
-                    chatMessages.SelectionMode = SelectionMode.None;
-                    chatMessages.ClearSelected();
+                    chatMessages.SelectedItems.Clear();
                 }
             }
             else
             {
-                chatMessages.SelectionMode = SelectionMode.None;
-                chatMessages.ClearSelected();
+                chatMessages.SelectedItems.Clear();
             }
         }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (chatMessages.SelectedItem != null)
+            if (chatMessages.FocusedItem != null)
             {
-                Clipboard.SetText(chatMessages.SelectedItem.ToString());
+                Clipboard.SetText(chatMessages.FocusedItem.Text.ToString());
+                chatMessages.SelectedItems.Clear();
             }
         }
     }

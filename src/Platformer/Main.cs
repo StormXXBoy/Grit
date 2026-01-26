@@ -192,6 +192,7 @@ namespace Platformer
 
                 return DynValue.FromObject(luaEngine.script, (Action)(() => { gameUI.DropDownItems.Remove(item); }));
             }));
+            luaEngine?.RegisterFunction("addMessage", (Action<string>)((message) => chatForm?.addMessage(message)));
 
             luaEngine.RunFile("packs/" + currentPack + "/scripts/main.lua");
 
@@ -527,7 +528,6 @@ namespace Platformer
             {
                 luaEngine?.Call("onNewMessage", message);
             };
-            luaEngine?.RegisterFunction("addMessage", (Action<string>)((message) => chatForm?.addMessage(message)));
         }
 
         private void Connect_Click(object sender, EventArgs e)
