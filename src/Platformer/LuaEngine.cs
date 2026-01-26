@@ -1,6 +1,7 @@
 ﻿using GritNetworking;
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.CoreLib;
+using MoonSharp.Interpreter.Loaders;
 using Platformer;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,6 @@ public class LuaEngine
     {
         script = new Script();
 
-        //this.RegisterFunction("print", (Action<string>)((input) => { Console.WriteLine(input); })); // Bruh I thought I had to define a print
         UserData.RegisterType<LuaClient>();
         UserData.RegisterType<NetVector>();
         UserData.RegisterType<NetEntity>();

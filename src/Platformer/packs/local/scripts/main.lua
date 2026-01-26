@@ -23,6 +23,9 @@ function init()
 	addButton("zoomies", function()
 		player.speed = player.speed * 2
 	end)
+	--addButton("test require", function()
+	--	require("test.lua")
+	--end)
 end
 
 function createBlock(pos, size)
