@@ -151,7 +151,9 @@ function onInput(inputInfo)
 end
 
 function onNewMessage(message)
-	print(message)
+	if message == "!help" then
+		addMessage("No help :(")
+	end
 end
 
 function loopT(table)

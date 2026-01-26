@@ -527,6 +527,7 @@ namespace Platformer
             {
                 luaEngine?.Call("onNewMessage", message);
             };
+            luaEngine?.RegisterFunction("addMessage", (Action<string>)((message) => chatForm?.addMessage(message)));
         }
 
         private void Connect_Click(object sender, EventArgs e)
