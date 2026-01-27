@@ -2,10 +2,12 @@
 using MoonSharp.Interpreter;
 using MoonSharp.Interpreter.CoreLib;
 using MoonSharp.Interpreter.Loaders;
+using MoonSharp.Interpreter.REPL;
 using Platformer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 
@@ -170,6 +172,25 @@ public class LuaEngine
         entityTable.Table.Set("player", createFunction((Func<DynValue>)(() => { return UserData.Create(new PlayerEntity()); })));
         entityTable.Table.Set("platform", createFunction((Func<DynValue>)(() => { return UserData.Create(new PlatformEntity()); })));
         script.Globals["Entity"] = entityTable;
+    }
+
+    public void SetPack(string pack)
+    {
+        FileSystemScriptLoader newScriptLoader = new FileSystemScriptLoader();
+        newScriptLoader.ModulePaths = new string[]
+        {
+                Path.Combine(
+                    Application.StartupPath,
+                    "packs",
+                    pack,
+                    "scripts",
+                    "?.lua"
+                )
+         };
+
+        newScriptLoader.IgnoreLuaPathGlobal = true;
+
+        script.Options.ScriptLoader = newScriptLoader;
     }
 
     public void RegisterObject(string name, object obj)

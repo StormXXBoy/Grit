@@ -194,6 +194,7 @@ namespace Platformer
             }));
             luaEngine?.RegisterFunction("addMessage", (Action<string>)((message) => chatForm?.addMessage(message)));
 
+            luaEngine.SetPack(currentPack);
             luaEngine.RunFile("packs/" + currentPack + "/scripts/main.lua");
 
             luaEngine?.Call("init");
