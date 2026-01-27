@@ -4,7 +4,8 @@ local elevator = Entity.platform()
 local npc = Entity.player()
 local networkClient = nil
 local bullets = {}
-local tagService = require("tagService") 
+local tagService = require("tagService")
+local delayService = require("delayService")
 
 function init()
 	startEnt = Entity.base();
@@ -56,6 +57,10 @@ function serverConnected(client)
 		bullet.size = Vector(10, 10)
 
 		bullets[bullet] = os.clock()
+		delayService.addDelay(function()
+			removeEntity(bullet)
+			bullets[bullet] = nil
+		end, 5)
 
 		addEntity(bullet)
 	end)
@@ -79,12 +84,8 @@ function update(dt)
 		npc.MoveHorizontal(dt, player.center.x - npc.center.x)
 		entityJump(npc)
 	end
-	for bullet, spawnTime in pairs(bullets) do
-		if os.clock() - spawnTime > 5 then
-			removeEntity(bullet)
-			bullets[bullet] = nil
-		end
-	end
+
+	delayService.update()
 end
 
 local bufferPoint = nil
@@ -170,4 +171,4 @@ function loopT(table)
 	end
 end
 
-loopT(Enum)
+--loopT(Enum)
