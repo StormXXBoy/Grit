@@ -4,6 +4,7 @@ local elevator = Entity.platform()
 local npc = Entity.player()
 local networkClient = nil
 local bullets = {}
+local tagService = require("tagService") 
 
 function init()
 	startEnt = Entity.base();
@@ -15,16 +16,17 @@ function init()
 	elevator.size = Vector(100, 20);
 	addEntity(elevator);
 	addEntity(npc)
+	tagService.addTag(npc, "npc")
 	local remBut
 	remBut = addButton("remove npc", function()
-		removeEntity(npc)
+		for _, ent in pairs(tagService.getAllObjectsWithTag("npc")) do
+			removeEntity(ent)
+			tagService.removeTag(ent)
+		end
 		remBut()
 	end)
 	addButton("zoomies", function()
 		player.speed = player.speed * 2
-	end)
-	addButton("test require", function()
-		require("test")
 	end)
 end
 
@@ -168,4 +170,4 @@ function loopT(table)
 	end
 end
 
---loopT(Enum)
+loopT(Enum)

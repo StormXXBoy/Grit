@@ -187,7 +187,7 @@ public class LuaEngine
                     "?.lua"
                 )
          };
-
+        
         newScriptLoader.IgnoreLuaPathGlobal = true;
 
         script.Options.ScriptLoader = newScriptLoader;
