@@ -167,7 +167,7 @@ namespace Platformer
 
             //luaEngine.RegisterObject("entities", entities);
             luaEngine.RegisterObject("player", player);
-            luaEngine.RegisterObject("input", input);
+            //luaEngine.RegisterObject("input", input); // Exposed via input function instead?
 
             var entitiesTable = DynValue.NewTable(luaEngine.script);
             entitiesTable.Table.Set("all", luaEngine.createFunction((Func<List<Entity>>)(() => entities)));
