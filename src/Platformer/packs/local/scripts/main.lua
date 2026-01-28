@@ -1,3 +1,12 @@
+function loopT(table)
+	for i, v in pairs(table) do
+		if type(v) == "table" then
+			loopT(v)
+		end
+		print(i, v)
+	end
+end
+
 local startEnt
 local newBullet = Entity.physics()
 local elevator = Entity.platform()
@@ -6,8 +15,14 @@ local networkClient = nil
 local bullets = {}
 local tagService = require("tagService")
 local delayService = require("delayService")
+local particleService = require("particleService")
+local shartParticles = particleService.new()
 
 function init()
+	particleService.init(delayService)
+	shartParticles.color = color(Enum.Color.Brown)
+	shartParticles.velocity = 3
+
 	startEnt = Entity.base();
 	startEnt.sprite.color = color(Enum.Color.Lime);
 	startEnt.position = Vector(200, 200);
@@ -150,6 +165,8 @@ function onInput(inputInfo)
 	end
 
 	if (inputInfo.key == Enum.Key.F and inputInfo.state == Enum.InputState.Down) then
+		shartParticles.position = player.center
+		shartParticles:emit(10)
 		if networkClient then
 			networkClient:fire("message", "*farts*")
 		end
@@ -159,15 +176,6 @@ end
 function onNewMessage(message)
 	if message == "!info" then
 		addMessage("Grit Project is a 2d platformer sandbox engine/game with multiplayer support writen in C# with WinForms where you can script with lua!")
-	end
-end
-
-function loopT(table)
-	for i, v in pairs(table) do
-		if type(v) == "table" then
-			loopT(v)
-		end
-		print(i, v)
 	end
 end
 

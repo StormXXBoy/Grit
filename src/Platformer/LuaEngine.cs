@@ -180,7 +180,7 @@ public class LuaEngine
         newScriptLoader.ModulePaths = new string[]
         {
                 Path.Combine(
-                    Application.StartupPath,
+                    //Application.StartupPath,
                     "packs",
                     pack,
                     "scripts",

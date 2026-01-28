@@ -122,7 +122,10 @@
     <None Include="packs\local\scripts\delayService.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="packs\local\scripts\tagservice.lua">
+    <None Include="packs\local\scripts\particleService.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packs\local\scripts\tagService.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\Settings.settings">
