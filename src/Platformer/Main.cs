@@ -1,22 +1,10 @@
 ﻿using GritNetworking;
 using MoonSharp.Interpreter;
-using NAudio;
-using NAudio.CoreAudioApi;
-using NAudio.Wave;
 using Netwerkr;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Platformer
@@ -72,46 +60,6 @@ namespace Platformer
             centerControl(gameScreen);
             centerControl(menu);
         }
-
-        //Point? bufferPoint = null;
-        //void HandleClick(object s, MouseEventArgs e)
-        //{
-        //    if (e.Button == MouseButtons.Right)
-        //    {
-        //        //if (bufferPoint == null)
-        //        //{
-        //        //    bufferPoint = e.Location;
-        //        //}
-        //        //else
-        //        //{
-        //        //    Point start = bufferPoint.Value;
-        //        //    Point end = e.Location;
-
-        //        //    int x = Math.Min(start.X, end.X);
-        //        //    int y = Math.Min(start.Y, end.Y);
-        //        //    int w = Math.Abs(end.X - start.X);
-        //        //    int h = Math.Abs(end.Y - start.Y);
-
-        //        //    addEntity(new PlatformEntity(x, y, w, h));
-        //        //    bufferPoint = null;
-        //        //}
-        //    }
-        //    else
-        //    {
-        //        //Vector shootDirection = new Vector(e.Location.X, e.Location.Y) - player.position;
-
-        //        //PhysicsEntity newBullet = new PhysicsEntity();
-
-        //        //newBullet.position = new Vector(player.center) - new Vector(0, 10);
-        //        //newBullet.acceleration = new Vector(player.acceleration);
-        //        //newBullet.velocity = new Vector(player.velocity) + (shootDirection.normalize() * 50f);
-        //        ////player.velocity += (shootDirection.normalize() * 50f);
-
-        //        //newBullet.size = new Vector(10, 10);
-
-        //        //addEntity(newBullet);
-        //    }
-        //}
 
         T addEntity<T>(T entity) where T : Entity
         {
@@ -318,25 +266,7 @@ namespace Platformer
 
         float gravity = 0.2f;
         float friction = 0.9f;
-        //void PhysicsLoop(float dt)
-        //{
-        //    foreach (var entity in physicsEntities)
-        //    {
-        //        if (!isGrounded(entity))
-        //            entity.acceleration.Y += gravity;
 
-        //        entity.velocity += entity.acceleration;
-
-        //        entity.acceleration *= friction;
-        //        entity.velocity *= friction;
-
-        //        entity.position.X += entity.velocity.X;
-        //        ResolveAxisCollision(entity, axisX: true);
-
-        //        entity.position.Y += entity.velocity.Y;
-        //        ResolveAxisCollision(entity, axisX: false);
-        //    }
-        //}
         void PhysicsLoop(float dt)
         {
             dt *= 40f;
@@ -430,66 +360,6 @@ namespace Platformer
                 entity.acceleration.X = 0;
             }
         }
-
-
-        //void ResolveAxisCollision(PhysicsEntity entity, bool axisX)
-        //{
-        //    RectangleF rect = new RectangleF(
-        //        entity.position.X,
-        //        entity.position.Y,
-        //        entity.size.X,
-        //        entity.size.Y
-        //    );
-
-        //    foreach (var collisionEnt in collisionEntities)
-        //    {
-        //        if (collisionEnt == entity) continue;
-
-        //        if (!rect.IntersectsWith(collisionEnt.bounds)) continue;
-
-        //        if (axisX)
-        //        {
-        //            if (entity.velocity.X > 0)
-        //                entity.position.X = collisionEnt.bounds.X - entity.size.X;
-        //            else if (entity.velocity.X < 0)
-        //                entity.position.X = collisionEnt.bounds.X + collisionEnt.bounds.Width;
-
-        //            entity.velocity.X *= -0.7f;
-        //            entity.acceleration.X = 0;
-        //        }
-        //        else
-        //        {
-        //            if (entity.velocity.Y > 0)
-        //                entity.position.Y = collisionEnt.bounds.Y - entity.size.Y;
-        //            else if (entity.velocity.Y < 0)
-        //                entity.position.Y = collisionEnt.bounds.Y + collisionEnt.bounds.Height;
-
-        //            entity.velocity.Y = 0;
-        //            entity.acceleration.Y = 0;
-        //        }
-        //    }
-
-        //    if (entity.position.Y + entity.size.Y > gameBounds.Height)
-        //    {
-        //        entity.position.Y = gameBounds.Height - entity.size.Y;
-        //        entity.velocity.Y = 0;
-        //        entity.acceleration.Y = 0;
-        //    }
-
-        //    if (entity.position.X + entity.size.X > gameBounds.Width)
-        //    {
-        //        entity.position.X = gameBounds.Width - entity.size.X;
-        //        entity.velocity.X *= -2;
-        //        entity.acceleration.X = 0;
-        //    }
-
-        //    if (entity.position.X < 0)
-        //    {
-        //        entity.position.X = 0;
-        //        entity.velocity.X *= -2;
-        //        entity.acceleration.X = 0;
-        //    }
-        //}
 
         void DrawLoop()
         {
