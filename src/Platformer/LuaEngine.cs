@@ -47,6 +47,11 @@ public class LuaEngine
     {
         script = new Script();
 
+        RegisterFunction("loadstring", (Func<string, DynValue>)((code) =>
+        {
+            return script.LoadString(code);
+        }));
+
         UserData.RegisterType<LuaClient>();
         UserData.RegisterType<NetVector>();
         UserData.RegisterType<NetEntity>();
