@@ -273,7 +273,11 @@ public class LuaEngine
         }
         catch (ScriptRuntimeException ex)
         {
-            Console.WriteLine("Lua function error: " + ex.DecoratedMessage);
+            Console.WriteLine("Lua function call error: " + ex.DecoratedMessage);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Function call error: " + ex.Message);
         }
     }
 }
