@@ -22,6 +22,8 @@ namespace GritNetworking
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("pack");
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
             }
         }
 
