@@ -97,14 +97,20 @@ namespace Platformer
             return entity;
         }
 
+        void newLocalPlayer()
+        {
+            player = new PlayerEntity();
+            player.sprite.image = Properties.Resources.Player;
+            addEntity(player);
+        }
+
         void resetGame()
         {
             foreach (var entity in entities.ToArray())
             {
                 removeEntity(entity);
             }
-            player.position = new Vector(0, 0);
-            addEntity(player);
+            newLocalPlayer();
             gameUI.DropDownItems.Clear();
             resetLua();
         }
@@ -171,9 +177,7 @@ namespace Platformer
                 menu.Enabled = menu.Visible;
             });
 
-            player = new PlayerEntity();
-            player.sprite.image = Properties.Resources.Player;
-            addEntity(player);
+            newLocalPlayer();
 
             soundMachine.LoadSound("jump", "packs/local/sounds/jump.mp3");
 
