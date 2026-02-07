@@ -12,7 +12,6 @@ local newBullet = Entity.physics()
 local elevator = Entity.platform()
 local npc = Entity.player()
 local networkClient = nil
-local bullets = {}
 local task = require("taskService")
 local tagService = require("tagService")
 local particleService = require("particleService")
@@ -71,10 +70,8 @@ function serverConnected(client)
 		bullet.velocity = Vector(netBullet.velocity.X, netBullet.velocity.Y)
 		bullet.size = Vector(10, 10)
 
-		bullets[bullet] = os.clock()
 		task.delay(5, function()
 			removeEntity(bullet)
-			bullets[bullet] = nil
 		end)
 
 		addEntity(bullet)
