@@ -13,8 +13,8 @@ local elevator = Entity.platform()
 local npc = Entity.player()
 local networkClient = nil
 local bullets = {}
+local task = require("taskService")
 local tagService = require("tagService")
-local delayService = require("delayService")
 local particleService = require("particleService")
 local shartParticles = particleService.new()
 
@@ -72,10 +72,10 @@ function serverConnected(client)
 		bullet.size = Vector(10, 10)
 
 		bullets[bullet] = os.clock()
-		delayService.addDelay(function()
+		task.delay(5, function()
 			removeEntity(bullet)
 			bullets[bullet] = nil
-		end, 5)
+		end)
 
 		addEntity(bullet)
 	end)
@@ -100,7 +100,7 @@ function update(dt)
 		entityJump(npc)
 	end
 
-	delayService.update()
+	task.update(dt)
 end
 
 local bufferPoint = nil
@@ -175,7 +175,10 @@ end
 
 function onNewMessage(message)
 	if message == "!info" then
-		addMessage("Grit Project is a 2d platformer sandbox engine/game with multiplayer support writen in C# with WinForms where you can script with lua!")
+		task.spawn(function()
+			task.wait(1)
+			addMessage("Grit Project is a 2d platformer sandbox engine/game with multiplayer support writen in C# with WinForms where you can script with lua!")
+		end)
 	elseif message:sub(1,6) == "!exec " then
 		loadstring(string.sub(message, 7, #message))()
 	end
