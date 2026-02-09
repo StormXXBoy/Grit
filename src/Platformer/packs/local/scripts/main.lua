@@ -18,7 +18,7 @@ local particleService = require("particleService")
 local shartParticles = particleService.new()
 
 function init()
-	particleService.init(delayService)
+	particleService.init(task)
 	shartParticles.color = color(Enum.Color.Brown)
 	shartParticles.velocity = 3
 

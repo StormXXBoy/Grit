@@ -1,7 +1,7 @@
 ﻿local particleService = {}
 
-function particleService.init(delayService)
-    particleService._delayService = delayService
+function particleService.init(task)
+    particleService._task = task
 end
 
 function particleService.new(delayService)
@@ -31,9 +31,9 @@ function particleService:emit(count)
             math.random(-self.velocity*200, self.velocity*100) / 100
         )
 
-        particleService._delayService.addDelay(function()
+        particleService._task.delay(self.lifetime + math.random() * 0.1, function()
             removeEntity(newEntity)
-        end, self.lifetime + math.random() * 0.1)
+        end)
 
         table.insert(self._entities, newEntity)
         addEntity(newEntity)
