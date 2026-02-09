@@ -460,6 +460,20 @@ namespace Platformer
             Console.WriteLine("Test button clicked");
             soundMachine.LoadSound("track03", "packs/local/sounds/track03.mp3");
             soundMachine.Play("track03");
+            PackSharing.createManifest(new PackInfo()
+            {
+                packDetails = new PackDetails()
+                {
+                    name = "Test Pack",
+                    description = "A test pack for demonstration purposes.",
+                    version = "1.0"
+                },
+                files = new List<FileInfo>()
+                {
+                    new FileInfo() { path = "packs/local/sounds/jump.mp3", hash = "abc123", size = 12345 },
+                    new FileInfo() { path = "packs/local/sounds/track03.mp3", hash = "def456", size = 67890 }
+                }
+            }, "packs/local/manifest.xml");
         }
 
         private void openChatButton_Click(object sender, EventArgs e)

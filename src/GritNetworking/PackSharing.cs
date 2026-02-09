@@ -22,6 +22,21 @@ namespace GritNetworking
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("pack");
+                writer.WriteAttributeString("version", packInfo.packDetails.version);
+                writer.WriteElementString("name", packInfo.packDetails.name);
+                writer.WriteElementString("description", packInfo.packDetails.description);
+                writer.WriteStartElement("files");
+                writer.WriteAttributeString("count", packInfo.files.Count.ToString());
+                writer.WriteAttributeString("size", packInfo.getTotalSize().ToString());
+                foreach (FileInfo file in packInfo.files)
+                {
+                    writer.WriteStartElement("file");
+                    writer.WriteAttributeString("hash", file.hash);
+                    writer.WriteAttributeString("size", file.size.ToString());
+                    writer.WriteString(file.path);
+                    writer.WriteEndElement();
+                }
+                writer.WriteEndElement();
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
             }
@@ -47,6 +62,7 @@ namespace GritNetworking
     {
         public string path;
         public string hash;
+        public int size;
 
         public FileInfo() { }
     }
@@ -64,6 +80,11 @@ namespace GritNetworking
     {
         public PackDetails packDetails;
         public List<FileInfo> files;
+
+        public int getTotalSize()
+        {
+            return files.Sum(f => f.size);
+        }
 
         public PackInfo() { }
     }
