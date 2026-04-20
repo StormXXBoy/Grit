@@ -11,3 +11,9 @@
     </td>
   </tr>
 </table>
+
+Putting this project on hold for now, maybe I'll come back to it later. There's still some stuff to do.
+- Server lists
+- Downloading server content
+- Accesing pack asset lua api
+- Account support via stormxxboy.com maybe
